@@ -1,0 +1,21 @@
+{
+  "name": "casino--bot",
+  "version": "1.0.0",
+  "description": "casino bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@foile/crypto-pay-api": "^1.0.4",
+    "dotenv": "^16.1.4",
+    "mongodb": "^5.6.0",
+    "mongoose": "^7.2.3",
+    "node-telegram-bot-api": "^0.61.0",
+    "nodemon": "^2.0.22",
+    "settings": "^0.1.1"
+  }
+}
