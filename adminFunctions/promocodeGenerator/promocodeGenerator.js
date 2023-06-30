@@ -1,9 +1,4 @@
-require('dotenv').config();
-
-const deepLink = process.env.TELEGRAM_DEEP_LINK;
-
-
-const generateReferralCode = () => {
+const generatePromocode = (percent) => {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; 
     let result = '';
 
@@ -12,7 +7,7 @@ const generateReferralCode = () => {
         result += characters.charAt(randomIndex);
       }
 
-    return result;
+    return result + '-' + percent;
 }
 
-module.exports = { generateReferralCode };
+module.exports = { generatePromocode }

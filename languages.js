@@ -67,6 +67,13 @@ const translate = {
             people_in: 'Люди, присоединившиеся по вашей реферальной ссылке:',
             no_referral_link: 'У вас ещё нет реферальной ссылки',
             have_referral_link: 'У вас уже есть реферальная ссылка!',
+            
+            ref_percentage: 'Уровень реферальной системы',
+
+            ref_options_profile: {
+                withdrawn: 'Вывести деньги на баланс',
+                back: 'Назад',
+            },
         },
         settings: {
             options: 'Настройки',
@@ -130,6 +137,13 @@ const translate = {
             people_in: 'People who have joined through your referral link:',
             no_referral_link: 'You don\'t have a referral link yet',
             have_referral_link: 'You already have a referral link!',
+
+            ref_percentage: 'Your referral level is',
+
+            ref_options_profile: {
+                withdrawn: 'Add to my balance',
+                back: 'Back',
+            },
         },
         wallet: {
             option: 'Wallet',

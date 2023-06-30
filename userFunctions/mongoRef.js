@@ -24,14 +24,13 @@ const profileSchema = new mongoose.Schema({
     },
     ref_info: {
         referral_code: String,
+        referral_balance_spend_with_one_link: Number,
         referral_invited_people: Array,
         referral_invited_people_count: Number,
-
         refrral_balance: {
             balance: Number,
             balance_withdrawn: Number,
         },
-
         referral_who_invited_id: String,
         referral_who_invited_referral_code: String,
     },
@@ -44,7 +43,13 @@ const profileSchema = new mongoose.Schema({
 
 
 });
+const adminSchema = new mongoose.Schema({
+    _id: String,
+    id: String,
+    user_name: String,
+});
 
 const allUsers = mongoose.model('allUsers', profileSchema);
+const allAdmins = mongoose.model('admins', adminSchema);
 
-module.exports = { allUsers };
+module.exports = { allUsers , allAdmins };

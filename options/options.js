@@ -1,7 +1,8 @@
-const { languageState } = require("./languages");
+const { languageState } = require("../languages");
 
 module.exports = (translate) => {
-    // START
+    // USER OPTIONS
+    // start
     const startOptions = (languageState) => {
         return {
             reply_markup: {
@@ -26,7 +27,7 @@ module.exports = (translate) => {
             },
         };
     };
-    // SETTINGS
+    // settings
     const settingsOptions = (languageState) => {
         return {
             reply_markup: {
@@ -56,7 +57,7 @@ module.exports = (translate) => {
             },
         };
     };
-    // GAME
+    // game
     const gamesOptions = (languageState) => {
         return {
             reply_markup: {
@@ -117,7 +118,7 @@ module.exports = (translate) => {
             },
         };
     };
-    // SLOTS 
+    // slots 
     const slotGameOption = (languageState) => {
         return {
             reply_markup: {
@@ -126,7 +127,7 @@ module.exports = (translate) => {
 
                         { text: '+', callback_data: 'slot_game_minus' },
                         { text: '$$$', callback_data: 'slot_game_' },
-                        { text:'-', callback_data: 'slot_game_plus' },
+                        { text: '-', callback_data: 'slot_game_plus' },
                     ],
                     [
 
@@ -143,7 +144,7 @@ module.exports = (translate) => {
             },
         };
     };
-    // WALLET
+    // wallet
     const walletOptions = (languageState) => {
         return {
             reply_markup: {
@@ -180,9 +181,9 @@ module.exports = (translate) => {
         return {
             reply_markup: {
                 inline_keyboard: [
-                  [{ text: 'Pay', pay: true }] // Кнопка оплаты
+                    [{ text: 'Pay', pay: true }] // Кнопка оплаты
                 ],
-              },
+            },
         };
     };
     // topup ctypto;
@@ -214,7 +215,7 @@ module.exports = (translate) => {
     //     };
     // };
     // REFERRAL;
-    const referralOptions = (languageState)  => {
+    const referralOptions = (languageState) => {
         return {
             reply_markup: {
                 inline_keyboard: [
@@ -228,8 +229,8 @@ module.exports = (translate) => {
             }
         }
     };
-    // REFERRAL BALANCE
-    const referralBalanceOptions = (languageState)  => {
+    //referral balance
+    const referralBalanceOptions = (languageState) => {
         return {
             reply_markup: {
                 inline_keyboard: [
@@ -243,28 +244,42 @@ module.exports = (translate) => {
             }
         }
     };
+    const referralBalanceProfile = (languageState) => {
+        return {
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        { text: translate[languageState].referral.ref_options_profile.withdrawn, callback_data: 'referral_balance_profile_withdrawn' },
 
+                    ],
+                    [{ text: translate[languageState].referral.ref_options_profile.back, callback_data: 'referral_balance_profile_back' },],
+                ]
+            }
+        }
+    }
 
-
-
-    return { startOptions, 
-        settingsOptions, 
+    return {
+        // USER OPTIONS
+        startOptions,
+        settingsOptions,
         languageOptions,
         // wallet
-         walletOptions,
-         topUpOptions,
-         makepaymentTEST,
+        walletOptions,
+        topUpOptions,
+        makepaymentTEST,
         //  topUpCrypto,
         // slots
         slotLowBalance,
-         gamesOptions,
-         slotOptions,
-         diceOptions,
-         slotGameOption,
+        gamesOptions,
+        slotOptions,
+        diceOptions,
+        slotGameOption,
         // referral
         referralOptions,
         // referral balance
         referralBalanceOptions,
-
-        };
+        referralBalanceProfile,
+    };
 };
+
+
