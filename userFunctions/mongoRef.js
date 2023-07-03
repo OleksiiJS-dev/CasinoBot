@@ -4,6 +4,7 @@ const profileSchema = new mongoose.Schema({
     _id: String,
     id: String,
     user_name: String,
+    promo: Number,
     profile: {
         first_name: String,
         last_name: String,

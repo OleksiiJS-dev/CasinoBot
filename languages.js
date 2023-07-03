@@ -50,12 +50,19 @@ const translate = {
             options: ['Крипта', 'Фиат'],
             back: 'Назад',
 
+            fiat_later: 'Будет добавлено позже',
+
             topup_message_topup: 'Введите сумму которую хотите пополнить',    
             topup_message_currency: 'Выберите способ пополнения:',
 
             pay: 'оплатить',
 
             low_balance: 'На вашем счету должно быть 0.10$ для игры',
+
+            promocode: 'Ввести промокод',
+            promocode_activate: 'Введите промокод',
+            promocode_activated: 'Промокод активирован',
+            promocode_not_activated: 'Промокод не действителен',
         },
         referral: {
             option: 'Реферальная ссылка',
@@ -153,13 +160,19 @@ const translate = {
             options: ['Crypto', 'Fiat'],
             back: 'Back',
 
-            
+            fiat_later: 'We will add it later...',
+
             topup_message_topup: 'Enter the amount you want to deposit',
             topup_message_currency: 'Choose how you want to recharge:',
 
             pay: 'Pay',
 
             low_balance: 'You must have $0.10 in your account to play',
+
+            promocode: 'Promocode',
+            promocode_activate: 'Enter promocode',
+            promocode_activated: 'Promocode activated:',
+            promocode_not_activated: 'Promocode не is not valid',
         }
     },
 };

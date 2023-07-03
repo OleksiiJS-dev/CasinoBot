@@ -171,6 +171,7 @@ module.exports = (translate) => {
                     ],
                     [{ text: translate[languageState].wallet.help, callback_data: 'help' },],
                     // test
+                    [{ text: translate[languageState].wallet.promocode, callback_data: 'promocode' },],
                     [{ text: "+100", callback_data: '+100' },],
                     [{ text: translate[languageState].wallet.back, callback_data: 'topUpBack' },],
                 ],
@@ -257,7 +258,20 @@ module.exports = (translate) => {
             }
         }
     }
+    // promocode activation
+    const promocodeActivation = (languageState) => {
+        return {
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        { text: translate[languageState].referral.ref_options_profile.withdrawn, callback_data: 'referral_balance_profile_withdrawn' },
 
+                    ],
+                    [{ text: translate[languageState].referral.ref_options_profile.back, callback_data: 'referral_balance_profile_back' },],
+                ]
+            }
+        }
+    }
     return {
         // USER OPTIONS
         startOptions,
@@ -279,6 +293,9 @@ module.exports = (translate) => {
         // referral balance
         referralBalanceOptions,
         referralBalanceProfile,
+        // promocode
+        promocodeActivation ,
+
     };
 };
 

@@ -87,7 +87,6 @@ const cryptoPay = new CryptoPay(cryptoToken, {
     });
     // console.log(invoice);
 })();
-
 // SETTINGS
 // language switch
 const switchToRu = () => {
@@ -96,7 +95,6 @@ const switchToRu = () => {
 const switchToEn = () => {
     languageState = 'en';
 };
-
 // get ref code function
 const refCode = generateReferralCode();
 // User Initioalization
@@ -119,11 +117,9 @@ ${translate[a].profile.balance} : ${b.profile.balance} $
 ${translate[a].profile.status} : ${profileStatus}
 `;
 };
-
 // ADMIN
 // admin array
 const admins = ['!@#!@#'];
-
 // /start options (admin, existing user, referral check)
 bot.onText(/\/start/, async (msg, match) => {
     const chatId = msg.chat.id;
@@ -201,6 +197,7 @@ bot.onText(/\/start/, async (msg, match) => {
                         _id: chatId,
                         id: chatId,
                         user_name: userName,
+                        promo: 0,
                         profile: {
                             first_name: msg.from.first_name,
                             last_name: msg.from.last_name,
@@ -246,7 +243,6 @@ bot.onText(/\/start/, async (msg, match) => {
         };
     }
 });
-
 // USER
 // referral
 bot.on("callback_query", async (query) => {
@@ -341,7 +337,6 @@ ${translate[a].referral.ref_percentage}: ${percentage} %
         });
     }
     else if (query.data === "referral_balance_profile_withdrawn"){
-        
     }
     else if (query.data === "referral_balance_profile_back"){
         await bot.editMessageText(referralMessage(languageState, user), {
@@ -361,13 +356,11 @@ bot.on("callback_query", async (query) => {
     ${translate[a].wallet.topup_message_currency}
             `
     };
-
     let walletTopUpCryptoMessage = (a, b) => {
         return `
     ${translate[a].wallet.topup_message_topup}
             `
     };
-
     // wallet open
     if (query.data === 'wallet') {
         await bot.editMessageText(profile(languageState, user), {
@@ -428,6 +421,44 @@ bot.on("callback_query", async (query) => {
         const messageId = query.message.message_id;
         const chatId = query.message.chat.id;
         await bot.deleteMessage(chatId, messageId);
+    }
+    else if (query.data === 'fiat') {
+        await bot.sendMessage(chatId, translate[languageState].wallet.fiat_later, deleteMessage);
+    }
+    else if (query.data === 'promocode') {
+        await bot.sendMessage(chatId, translate[languageState].wallet.promocode_activate, deleteMessage);
+        bot.on('message', async (message) => {
+            const input = message.text;
+
+            if (message.chat.id === chatId) {
+                // promo
+                const existingPromocode = await promocodes.findOne({ code: input });
+                const promocodePercent = existingPromocode.value
+                // user
+                const user = await allUsers.findOne({ _id: chatId })
+                if (existingPromocode 
+                    && existingPromocode.status === "active"
+                    ) {
+                    // promo
+                    existingPromocode.status = 'used';
+                    existingPromocode.used_by= chatId;
+                    existingPromocode.used_by_id= chatId;
+                    existingPromocode.save();
+                    // user
+                    user.promo = promocodePercent;
+                    user.save();
+
+                    await bot.sendMessage(chatId, `${translate[languageState].wallet.promocode_activated} ${existingPromocode.code} ${promocodePercent}%`, deleteMessage);
+                    await bot.deleteMessage(chatId, message.message_id);
+                    await bot.deleteMessage(chatId, message.message_id - 1);
+                    console.log(user, existingPromocode)
+                } else {
+                    await bot.sendMessage(chatId, translate[languageState].wallet.promocode_not_activated, deleteMessage);
+                    await bot.deleteMessage(chatId, message.message_id);
+                }
+                bot.off('message');
+            }
+        });
     }
 });
 // games 
@@ -758,7 +789,6 @@ bot.on('callback_query', async (query) => {
         console.log(query)
     }
 });
-
 // ADMIN
 bot.on('callback_query', async (query) => {
     // promocodes
@@ -856,35 +886,41 @@ bot.on('callback_query', async (query) => {
         bot.on('message', async (message) => {
             if (message.chat.id === chatId) {
                 const input = message.text;
-                // Проверка, что введено число
-                if (!isNaN(input) && !isNaN(input) > 0) {
-                    const value = parseInt(input);
-                    const newCustomPromocode = generatePromocode(value);
-                    const newCustomPromo = new promocodes({
-                        code: newCustomPromocode,
-                        value: value,
-                        status: "active",
-                        date: {
-                            creation: new Date(),
-                            expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
-                        },
-                        used_by: '',
-                        used_by_id: '',
-                    });
-                    newCustomPromo.save();
-                    await bot.sendMessage(chatId, `Прмокод ${newCustomPromocode} на ${value}% успешно создан и отправлен в базу, для получение полного списка и взаимодействия с ними откройте пункт в меню 'Список промокодов'`, deleteMessage);
-                    await bot.deleteMessage(chatId, message.message_id);
-                } else {
-
-                    await bot.sendMessage(chatId, "Вы ввели не правильное число", deleteMessage);
-                    await bot.deleteMessage(chatId, message.message_id);
+                
+                if (message.chat.id === chatId) {
+                    
+                    // Проверка, что введено число
+                    if (!isNaN(input) && !isNaN(input) > 0) {
+                        const value = parseInt(input);
+                        const newCustomPromocode = generatePromocode(value);
+                        const newCustomPromo = new promocodes({
+                            code: newCustomPromocode,
+                            value: value,
+                            status: "active",
+                            date: {
+                                creation: new Date(),
+                                expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
+                            },
+                            used_by: '',
+                            used_by_id: '',
+                        });
+                        newCustomPromo.save();
+                        await bot.sendMessage(chatId, `Прмокод ${newCustomPromocode} на ${value}% успешно создан и отправлен в базу, для получение полного списка и взаимодействия с ними откройте пункт в меню 'Список промокодов'`, deleteMessage);
+                        await bot.deleteMessage(chatId, message.message_id);
+                    } else {
+    
+                        await bot.sendMessage(chatId, "Вы ввели не правильное число", deleteMessage);
+                        await bot.deleteMessage(chatId, message.message_id);
+                    }
+    
+                    bot.off('message');
                 }
 
-                bot.off('message');
             }
         });
     };
 });
+//  get all promocodes
 bot.on('callback_query', async (query) => {
     if (query.data === "admin_promocodes_get_all") {
         chatId = query.from.id;
@@ -895,8 +931,9 @@ bot.on('callback_query', async (query) => {
         console.log(allPromoMessage);
         bot.sendMessage(chatId, `Все промокоды\nЦифры в конце указывают на % к пополнению:\n${allPromoMessage}`, deleteMessage);
     }
+});
 
-})
+//  get info about user
 // bot.on('callback_query', async (query) => {
 
 // })
