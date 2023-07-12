@@ -118,6 +118,36 @@ module.exports = (translate) => {
             },
         };
     };
+    const diceOptionsGame = (languageState) => {
+        return {
+            reply_markup: {
+                    inline_keyboard : [
+                        [ { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_value_' },],
+                        [
+                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_1' },
+                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_2' },
+                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_3' },
+                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_4' },
+                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_5' },
+                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_6' },
+                        ],
+                        [
+                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_1_2' },
+                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_3-4' },
+                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_5-6' },
+                        ],
+                        [
+                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_even' },
+                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_odd' },
+                        ],
+                        [
+                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_back' },
+                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_play' },
+                        ],
+                    ]
+            },
+        };
+    };
     // slots 
     const slotGameOption = (languageState) => {
         return {
@@ -125,9 +155,9 @@ module.exports = (translate) => {
                 inline_keyboard: [
                     [
 
-                        { text: '+', callback_data: 'slot_game_minus' },
+                        { text: '', callback_data: 'slot_game_minus' },
                         { text: '$$$', callback_data: 'slot_game_' },
-                        { text: '-', callback_data: 'slot_game_plus' },
+                        { text: '+', callback_data: 'slot_game_plus' },
                     ],
                     [
 
@@ -287,6 +317,7 @@ module.exports = (translate) => {
         gamesOptions,
         slotOptions,
         diceOptions,
+        diceOptionsGame,
         slotGameOption,
         // referral
         referralOptions,

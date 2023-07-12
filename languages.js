@@ -32,13 +32,24 @@ const translate = {
                 double: 'Удвоить',
                 slot_game_back: 'Назад',
                 slot_game_spin: '🔄 Крутить',
+                bet_is_too_big: 'Сликом большая ставка',
+                bet_is_too_small: 'Слишком маленькая ставка',
+                bet_is_too_small: 'Слишком маленькая ставка',
+                bet: 'Ставка',
+                max_bet: 'Максимальная ставка',
+                min_bet: 'Минимальная ставка',
             },
             dice: {
                 message: '🎲️ Бросайте кубик и испытайте свою удачу',
+                message_game: 'Отправь сумму ставки и выбери исход:',
                 dice_message: 'Выберите режим:',
                 dice_st: 'Против игрока',
                 dice_nd: 'Против диллера',
                 back: 'Назад',
+                bet: 'Размер ставки',
+                throw: 'Бросить 🎲',
+                even: 'Четные',
+                odd: 'Нечетные',
             },
 
         },
@@ -52,6 +63,7 @@ const translate = {
 
             fiat_later: 'Будет добавлено позже',
 
+            topup_message_crypto: 'Пожалуйста, выберите валюту',
             topup_message_topup: 'Введите сумму которую хотите пополнить',    
             topup_message_currency: 'Выберите способ пополнения:',
 
@@ -63,6 +75,7 @@ const translate = {
             promocode_activate: 'Введите промокод',
             promocode_activated: 'Промокод активирован',
             promocode_not_activated: 'Промокод не действителен',
+            promoused: 'Промокод вы уже использовали',
         },
         referral: {
             option: 'Реферальная ссылка',
@@ -124,13 +137,23 @@ const translate = {
                 double: 'Double',
                 slot_game_back: 'Back',
                 slot_game_spin: '🔄 Spin',
+                bet_is_too_big: 'Bet is too big!',
+                bet_is_too_small: 'Bet is too small!',
+                bet: 'Bet',
+                max_bet: 'Maximum bet',
+                min_bet: 'Mininun bet',
             },
             dice: {
                 message: '🎲️ Roll the dice and try your luck',
+                message_game: 'Send the bet amount and choose the outcome:',
                 dice_message: 'Select mode:',
                 dice_st: 'Against the player',
                 dice_nd: 'Against the dealer',
                 back: 'Back',
+                bet: 'Bet amount',
+                throw: 'Throw 🎲',
+                even: 'Even',
+                odd: 'Odd',
             },
 
         },
@@ -162,6 +185,7 @@ const translate = {
 
             fiat_later: 'We will add it later...',
 
+            topup_message_crypto: 'Please, choose the currency',
             topup_message_topup: 'Enter the amount you want to deposit',
             topup_message_currency: 'Choose how you want to recharge:',
 
@@ -173,6 +197,7 @@ const translate = {
             promocode_activate: 'Enter promocode',
             promocode_activated: 'Promocode activated:',
             promocode_not_activated: 'Promocode не is not valid',
+            promoused: 'You have active promo',
         }
     },
 };

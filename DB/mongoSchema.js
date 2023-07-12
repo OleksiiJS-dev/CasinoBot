@@ -12,24 +12,12 @@ const profileSchema = new mongoose.Schema({
         status_en: String,
         status_ru: String,
         balance: Number,
-        referral: String,
     },
-    game_info: {
-        slot_game_played: Number,
-        slot_game_win: Number,
-        slot_game_loss: Number,
-        dice_game_played: Number,
-        dice_game_win: Number,
-        dice_game_loss: Number,
-
-    },
-    ref_info: {
+    referral_info: {
         referral_code: String,
         referral_balance_spend_with_one_link: Number,
-        referral_invited_people: Array,
-        referral_invited_people_count: Number,
-        refrral_balance: {
-            balance: Number,
+        referral_balance: {
+            balance_earned: Number,
             balance_withdrawn: Number,
         },
         referral_who_invited_id: String,
@@ -38,7 +26,24 @@ const profileSchema = new mongoose.Schema({
     balance: {
         withdrawn: Number,
         spend: Number,
-        balance: Number,
+        m_spend: Number,
+    },
+    game_info: {
+        slot_bet: Number,
+
+        slot_game_played: Number,
+        slot_game_win: Number,
+        slot_game_loss: Number,
+
+        dice_bet: Number,
+        dice_game_position: Array,
+        dice_game_played: Number,
+        dice_game_win: Number,
+        dice_game_loss: Number,
+        dice_game: {
+            room: String,
+        }
+
     },
 
 
