@@ -97,32 +97,31 @@ let newUser;
 // existing user initialization
 let existingUser;
 // profile initialization
-let profile = (a, b) => {
-    
+const profile = (a, b) => {
     let profileStatus;
-    if (b.balance.m_spend > 15 ) {
+    if (b.balance.m_spend > 15 && b.balance.m_spend <= 250) {
         b.profile.status_ru = translate[a].profile.status_lvl[1]
-        b.profile.status_en =  translate[a].profile.status_lvl[1]
+        b.profile.status_en = translate[a].profile.status_lvl[1]
     }
-    else if ( b.balance.m_spend > 250 ) {
-        b.profile.status_ru =  translate[a].profile.status_lvl[2]
-        b.profile.status_en =  translate[a].profile.status_lvl[2]
+    if (b.balance.m_spend > 250 && b.balance.m_spend <= 1000) {
+        b.profile.status_ru = translate[a].profile.status_lvl[2]
+        b.profile.status_en = translate[a].profile.status_lvl[2]
     }
-    else if ( b.balance.m_spend > 1000 ) {
-        b.profile.status_ru =  translate[a].profile.status_lvl[3]
-        b.profile.status_en =  translate[a].profile.status_lvl[3]
+    else if (b.balance.m_spend > 1000 && b.balance.m_spend <= 5000) {
+        b.profile.status_ru = translate[a].profile.status_lvl[3]
+        b.profile.status_en = translate[a].profile.status_lvl[3]
     }
-    else if ( b.balance.m_spend > 5000 ) {
-        b.profile.status_ru =  translate[a].profile.status_lvl[4]
-        b.profile.status_en =  translate[a].profile.status_lvl[4]
+    else if (b.balance.m_spend > 5000 && b.balance.m_spend <= 15000) {
+        b.profile.status_ru = translate[a].profile.status_lvl[4]
+        b.profile.status_en = translate[a].profile.status_lvl[4]
     }
-    else if ( b.balance.m_spend > 15000 ) {
-        b.profile.status_ru =  translate[a].profile.status_lvl[5]
-        b.profile.status_en =  translate[a].profile.status_lvl[5]
-    }  
+    else if (b.balance.m_spend > 15000) {
+        b.profile.status_ru = translate[a].profile.status_lvl[5]
+        b.profile.status_en = translate[a].profile.status_lvl[5]
+    }
     else {
-        b.profile.status_ru =  translate[a].profile.status_lvl[0]
-        b.profile.status_en =  translate[a].profile.status_lvl[0]
+        b.profile.status_ru = translate[a].profile.status_lvl[0]
+        b.profile.status_en = translate[a].profile.status_lvl[0]
     }
     b.save()
     if (a === 'ru') {
@@ -319,7 +318,7 @@ bot.on("callback_query", async (query) => {
         const invitedUsersCount = await allUsers.find({ "referral_info.referral_who_invited_id": chatId })
         const thisUser = await allUsers.findOne({ _id: chatId });
         const count = invitedUsersCount.length;
-        
+
         let balance = thisUser.referral_info.referral_balance.balance_earned;
         // let balance = thisUser.referral_info.referral_balance_spend_with_one_link;
 
@@ -697,7 +696,7 @@ bot.on('callback_query', async (query) => {
     // minus button
     else if (query.data === 'slot_game_minus') {
         switch (user.game_info.slot_bet) {
-            case slot_bet = 0.1: 
+            case slot_bet = 0.1:
                 await bot.editMessageText(slotsGameMessageBetIsTooSmall(languageState), {
                     chat_id: chatId,
                     message_id: messageId,
@@ -722,8 +721,8 @@ bot.on('callback_query', async (query) => {
                         ],
                     },
                 });
-            break;
-            default : 
+                break;
+            default:
                 newBet = user.game_info.slot_bet
                 newBet = newBet - 0.1
                 newBet = parseFloat(newBet)
@@ -754,7 +753,7 @@ bot.on('callback_query', async (query) => {
                         ],
                     },
                 });
-            break;
+                break;
         };
     }
     // plus button
@@ -773,21 +772,21 @@ bot.on('callback_query', async (query) => {
                                 { text: '+', callback_data: 'foobar' },
                             ],
                             [
-    
+
                                 { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
                                 { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
                                 { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
                             ],
                             [
-    
+
                                 { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
                                 { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
                             ],
                         ],
                     },
                 });
-            break;
-            default :
+                break;
+            default:
                 newBet = user.game_info.slot_bet
                 newBet = newBet + 0.1
                 newBet = parseFloat(newBet)
@@ -818,71 +817,69 @@ bot.on('callback_query', async (query) => {
                         ],
                     },
                 });
-            break;
+                break;
         };
     }
     // double button
     else if (query.data === 'slot_game_double') {
-        switch (user.game_info.slot_bet) {
-            case slot_bet > 50:
-                await bot.editMessageText(slotsGameMessage(languageState, user, user.game_info.slot_bet), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: '-', callback_data: 'slot_game_minus' },
-                                { text: betButton(user.game_info.slot_bet), callback_data: 'slot_game_____' },
-                                { text: '+', callback_data: 'foobar' },
-                            ],
-                            [
-    
-                                { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
-                                { text: translate[languageState].games.slots.double, callback_data: 'foobar' },
-                                { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
-                            ],
-                            [
-    
-                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
-                                { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
-                            ],
+        if (user.game_info.slot_bet > 50) {
+            await bot.editMessageText(slotsGameMessage(languageState, user, user.game_info.slot_bet), {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            { text: '-', callback_data: 'slot_game_minus' },
+                            { text: betButton(user.game_info.slot_bet), callback_data: 'slot_game_____' },
+                            { text: '+', callback_data: 'slot_game_plus' },
                         ],
-                    },
-                });
-            break;
-            default:
-                newBet = user.game_info.slot_bet
-                newBet = newBet * 2
-                newBet = parseFloat(newBet)
-                newBet = newBet.toFixed(2)
-                user.game_info.slot_bet = parseFloat(newBet)
-                user.save()
-                await bot.editMessageText(slotsGameMessage(languageState, user, user.game_info.slot_bet), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: '-', callback_data: 'slot_game_minus' },
-                                { text: betButton(user.game_info.slot_bet), callback_data: 'slot_game_____' },
-                                { text: '+', callback_data: 'slot_game_plus' },
-                            ],
-                            [
+                        [
 
-                                { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
-                                { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
-                                { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
-                            ],
-                            [
-
-                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
-                                { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
-                            ],
+                            { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
+                            { text: translate[languageState].games.slots.double, callback_data: 'foobar' },
+                            { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
                         ],
-                    },
-                });
-            break;
-        };
+                        [
+
+                            { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
+                            { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
+                        ],
+                    ],
+                },
+            });
+        }
+        else {
+            newBet = user.game_info.slot_bet
+            newBet = newBet * 2
+            newBet = parseFloat(newBet)
+            newBet = newBet.toFixed(2)
+            user.game_info.slot_bet = parseFloat(newBet)
+            user.save()
+            await bot.editMessageText(slotsGameMessage(languageState, user, user.game_info.slot_bet), {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            { text: '-', callback_data: 'slot_game_minus' },
+                            { text: betButton(user.game_info.slot_bet), callback_data: 'slot_game_____' },
+                            { text: '+', callback_data: 'slot_game_plus' },
+                        ],
+                        [
+
+                            { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
+                            { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
+                            { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
+                        ],
+                        [
+
+                            { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
+                            { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
+                        ],
+                    ],
+                },
+            });
+        }
     }
     // slot game min game
     else if (query.data === 'slit_game_min') {
@@ -899,13 +896,13 @@ bot.on('callback_query', async (query) => {
                                 { text: '+', callback_data: 'slot_game_plus' },
                             ],
                             [
-    
+
                                 { text: translate[languageState].games.slots.min, callback_data: 'foobar' },
                                 { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
                                 { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
                             ],
                             [
-    
+
                                 { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
                                 { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
                             ],
@@ -913,7 +910,7 @@ bot.on('callback_query', async (query) => {
                     },
                 });
                 break;
-            default: 
+            default:
                 newBet = user.game_info.slot_bet
                 newBet = 0.1
                 newBet = parseFloat(newBet)
@@ -931,13 +928,13 @@ bot.on('callback_query', async (query) => {
                                 { text: '+', callback_data: 'slot_game_plus' },
                             ],
                             [
-        
+
                                 { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
                                 { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
                                 { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
                             ],
                             [
-        
+
                                 { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
                                 { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
                             ],
@@ -962,20 +959,20 @@ bot.on('callback_query', async (query) => {
                                 { text: '+', callback_data: 'slot_game_plus' },
                             ],
                             [
-    
+
                                 { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
                                 { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
                                 { text: translate[languageState].games.slots.max, callback_data: 'foobar' },
                             ],
                             [
-    
+
                                 { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
                                 { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
                             ],
                         ],
                     },
                 });
-            break;
+                break;
             default:
                 newBet = user.game_info.slot_bet
                 newBet = 100
@@ -994,230 +991,230 @@ bot.on('callback_query', async (query) => {
                                 { text: '+', callback_data: 'slot_game_plus' },
                             ],
                             [
-    
+
                                 { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
                                 { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
                                 { text: translate[languageState].games.slots.max, callback_data: 'foobar' },
                             ],
                             [
-    
+
                                 { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
                                 { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
                             ],
                         ],
                     },
                 });
-            break;
+                break;
         };
     }
     // foobar
-    else if( query.data === 'foobar') {
+    else if (query.data === 'foobar') {
         console.log('foobar')
     }
 
     // spin
     else if (query.data === 'slot_game_spin') {
-        if ( user.game_info.slot_bet > user.profile.balance) {
+        if (user.game_info.slot_bet > user.profile.balance) {
             bot.sendMessage(chatId, '[**No balance]', deleteMessage);
-        } 
+        }
         else {
-        let user = await allUsers.findOne({ _id: chatId });
-        let referralUser = await allUsers.findOne({ _id: user.referral_info.referral_who_invited_id })
-        // win bet
-        // console.log(referralUser)
-        console.log(user)
-        let winBet
-        // emoji
-        const emoji = `🎰`
-        //
-        const x3Win = [64]
-        const x2Win = [1, 22, 43]
-        const p20Win = [2, 3, 4, 5, 6, 9, 11, 16, 17, 18, 21, 23, 24, 26, 27, 32, 33, 35, 38, 41, 42, 43, 44, 48, 49, 54, 56, 59, 60, 61, 62, 63]
-        const p10Win = [0, 7, 8, 10, 12, 13, 14, 15, 19, 20, 25, 28, 29, 30, 31, 34, 36, 37, 39, 40, 45, 46, 47, 50, 51, 52, 53, 55, 57, 58];
-        
-        bot.editMessageText('...', {
-            chat_id: chatId,
-            message_id: messageId,
-        });
+            let user = await allUsers.findOne({ _id: chatId });
+            let referralUser = await allUsers.findOne({ _id: user.referral_info.referral_who_invited_id })
+            // win bet
+            // console.log(referralUser)
+            console.log(user)
+            let winBet
+            // emoji
+            const emoji = `🎰`
+            //
+            const x3Win = [64]
+            const x2Win = [1, 22, 43]
+            const p20Win = [2, 3, 4, 5, 6, 9, 11, 16, 17, 18, 21, 23, 24, 26, 27, 32, 33, 35, 38, 41, 42, 43, 44, 48, 49, 54, 56, 59, 60, 61, 62, 63]
+            const p10Win = [0, 7, 8, 10, 12, 13, 14, 15, 19, 20, 25, 28, 29, 30, 31, 34, 36, 37, 39, 40, 45, 46, 47, 50, 51, 52, 53, 55, 57, 58];
 
-        await bot.sendDice(chatId, { emoji })
-            .then(async (response) => {
-                console.log(response)
-                let diceValue = response.dice.value;
-                if (x3Win.includes(diceValue)) {
+            bot.editMessageText('...', {
+                chat_id: chatId,
+                message_id: messageId,
+            });
 
-                    winBet = user.game_info.slot_bet * 3
-                    
-                    console.log(winBet)
-                    winBet = parseToNum(winBet)
+            await bot.sendDice(chatId, { emoji })
+                .then(async (response) => {
+                    console.log(response)
+                    let diceValue = response.dice.value;
+                    if (x3Win.includes(diceValue)) {
 
-                    user.profile.balance = user.profile.balance - user.game_info.slot_bet
-                    user.profile.balance = user.profile.balance + winBet
-                    user.profile.balance = parseToNum(user.profile.balance)
+                        winBet = user.game_info.slot_bet * 3
 
-                    user.balance.m_spend = user.balance.m_spend + user.game_info.slot_bet
-                    user.balance.m_spend = parseToNum(user.balance.m_spend)
+                        console.log(winBet)
+                        winBet = parseToNum(winBet)
 
-                    user.game_info.slot_game_win = user.game_info.slot_game_win + winBet
-                    user.game_info.slot_game_win = parseToNum(user.game_info.slot_game_win)
-                    user.game_info.slot_game_loss = user.game_info.slot_game_loss + user.game_info.slot_bet
-                    user.game_info.slot_game_loss = parseToNum(user.game_info.slot_game_loss)
+                        user.profile.balance = user.profile.balance - user.game_info.slot_bet
+                        user.profile.balance = user.profile.balance + winBet
+                        user.profile.balance = parseToNum(user.profile.balance)
 
-                    if( user.referral_info.referral_who_invited_id != '') {
-                        referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + user.game_info.slot_bet
-                        referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
-                        referralUser.save()
+                        user.balance.m_spend = user.balance.m_spend + user.game_info.slot_bet
+                        user.balance.m_spend = parseToNum(user.balance.m_spend)
+
+                        user.game_info.slot_game_win = user.game_info.slot_game_win + winBet
+                        user.game_info.slot_game_win = parseToNum(user.game_info.slot_game_win)
+                        user.game_info.slot_game_loss = user.game_info.slot_game_loss + user.game_info.slot_bet
+                        user.game_info.slot_game_loss = parseToNum(user.game_info.slot_game_loss)
+
+                        if (user.referral_info.referral_who_invited_id != '') {
+                            referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + user.game_info.slot_bet
+                            referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
+                            referralUser.save()
+                        }
+
+                        user.balance.spend = user.balance.spend + user.game_info.slot_bet
+                        user.balance.spend = parseInt(user.balance.spend)
+                        user.game_info.slot_game_played += 1
+                        user.save()
+
+                        console.log(winBet, bet)
+                        await bot.editMessageText(`Ваш выигрыш ${winBet}$ \nВы виграли х3 от ставки`, {
+                            chat_id: chatId,
+                            message_id: messageId,
+                        });
                     }
-                    
-                    user.balance.spend = user.balance.spend + user.game_info.slot_bet
-                    user.balance.spend = parseInt(user.balance.spend )
-                    user.game_info.slot_game_played += 1
-                    user.save()
+                    else if (x2Win.includes(diceValue)) {
 
-                    console.log(winBet, bet)
-                    await bot.editMessageText(`Ваш выигрыш ${winBet}$ \nВы виграли х3 от ставки`, {
-                        chat_id: chatId,
-                        message_id: messageId,
-                    });
-                }
-                else if (x2Win.includes(diceValue)) {
+                        winBet = user.game_info.slot_bet * 2
 
-                    winBet = user.game_info.slot_bet * 2
-                    
-                    console.log(winBet)
-                    winBet = parseToNum(winBet)
+                        console.log(winBet)
+                        winBet = parseToNum(winBet)
 
-                    user.profile.balance = user.profile.balance - user.game_info.slot_bet
-                    user.profile.balance = user.profile.balance + winBet
-                    user.profile.balance = parseToNum(user.profile.balance)
+                        user.profile.balance = user.profile.balance - user.game_info.slot_bet
+                        user.profile.balance = user.profile.balance + winBet
+                        user.profile.balance = parseToNum(user.profile.balance)
 
-                    user.balance.m_spend = user.balance.m_spend + user.game_info.slot_bet
-                    user.balance.m_spend = parseToNum(user.balance.m_spend)
+                        user.balance.m_spend = user.balance.m_spend + user.game_info.slot_bet
+                        user.balance.m_spend = parseToNum(user.balance.m_spend)
 
-                    user.game_info.slot_game_win = user.game_info.slot_game_win + winBet
-                    user.game_info.slot_game_win = parseToNum(user.game_info.slot_game_win)
-                    user.game_info.slot_game_loss = user.game_info.slot_game_loss + user.game_info.slot_bet
-                    user.game_info.slot_game_loss = parseToNum(user.game_info.slot_game_loss)
+                        user.game_info.slot_game_win = user.game_info.slot_game_win + winBet
+                        user.game_info.slot_game_win = parseToNum(user.game_info.slot_game_win)
+                        user.game_info.slot_game_loss = user.game_info.slot_game_loss + user.game_info.slot_bet
+                        user.game_info.slot_game_loss = parseToNum(user.game_info.slot_game_loss)
 
-                    if( user.referral_info.referral_who_invited_id != '') {
-                        referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + user.game_info.slot_bet
-                        referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
-                        referralUser.save()
+                        if (user.referral_info.referral_who_invited_id != '') {
+                            referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + user.game_info.slot_bet
+                            referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
+                            referralUser.save()
+                        }
+
+
+                        user.balance.spend = user.balance.spend + user.game_info.slot_bet
+                        user.balance.spend = parseInt(user.balance.spend)
+                        user.game_info.slot_game_played += 1
+                        user.save()
+
+                        console.log(winBet, user.game_info.slot_bet)
+                        await bot.editMessageText(`Ваш выигрыш ${winBet}$ \nВы виграли х2 от ставки`, {
+                            chat_id: chatId,
+                            message_id: messageId,
+                        });
                     }
-                    
-                    
-                    user.balance.spend = user.balance.spend + user.game_info.slot_bet
-                    user.balance.spend = parseInt(user.balance.spend )
-                    user.game_info.slot_game_played += 1
-                    user.save()
-
-                    console.log(winBet, user.game_info.slot_bet)
-                    await bot.editMessageText(`Ваш выигрыш ${winBet}$ \nВы виграли х2 от ставки`, {
-                        chat_id: chatId,
-                        message_id: messageId,
-                    });
-                }
-                else if (p20Win.includes(diceValue)) {
+                    else if (p20Win.includes(diceValue)) {
 
 
-                    winBet = user.game_info.slot_bet * 0.2
-                    
-                    console.log(winBet)
-                    winBet = parseToNum(winBet)
+                        winBet = user.game_info.slot_bet * 0.2
 
-                    user.profile.balance = user.profile.balance - user.game_info.slot_bet
-                    user.profile.balance = user.profile.balance + winBet
-                    user.profile.balance = parseToNum(user.profile.balance)
+                        console.log(winBet)
+                        winBet = parseToNum(winBet)
 
-                    user.balance.m_spend = user.balance.m_spend + user.game_info.slot_bet
-                    user.balance.m_spend = parseToNum(user.balance.m_spend)
+                        user.profile.balance = user.profile.balance - user.game_info.slot_bet
+                        user.profile.balance = user.profile.balance + winBet
+                        user.profile.balance = parseToNum(user.profile.balance)
 
-                    user.game_info.slot_game_win = user.game_info.slot_game_win + winBet
-                    user.game_info.slot_game_win = parseToNum(user.game_info.slot_game_win)
-                    user.game_info.slot_game_loss = user.game_info.slot_game_loss + user.game_info.slot_bet
-                    user.game_info.slot_game_loss = parseToNum(user.game_info.slot_game_loss)
+                        user.balance.m_spend = user.balance.m_spend + user.game_info.slot_bet
+                        user.balance.m_spend = parseToNum(user.balance.m_spend)
 
-                    if( user.referral_info.referral_who_invited_id != '') {
-                        referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + user.game_info.slot_bet
-                        referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
-                        referralUser.save()
+                        user.game_info.slot_game_win = user.game_info.slot_game_win + winBet
+                        user.game_info.slot_game_win = parseToNum(user.game_info.slot_game_win)
+                        user.game_info.slot_game_loss = user.game_info.slot_game_loss + user.game_info.slot_bet
+                        user.game_info.slot_game_loss = parseToNum(user.game_info.slot_game_loss)
+
+                        if (user.referral_info.referral_who_invited_id != '') {
+                            referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + user.game_info.slot_bet
+                            referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
+                            referralUser.save()
+                        }
+
+                        user.balance.spend = user.balance.spend + user.game_info.slot_bet
+                        user.balance.spend = parseInt(user.balance.spend)
+                        user.game_info.slot_game_played += 1
+                        user.save()
+
+                        console.log(winBet, user.game_info.slot_bet)
+                        await bot.editMessageText(`Ваш выигрыш ${winBet}$ \nВы виграли 20% от ставки`, {
+                            chat_id: chatId,
+                            message_id: messageId,
+                        });
                     }
-                    
-                    user.balance.spend = user.balance.spend + user.game_info.slot_bet
-                    user.balance.spend = parseInt(user.balance.spend )
-                    user.game_info.slot_game_played += 1
-                    user.save()
+                    else if (p10Win.includes(diceValue)) {
+                        winBet = user.game_info.slot_bet * 0.1
+                        console.log(winBet)
+                        winBet = parseToNum(winBet)
 
-                    console.log(winBet, user.game_info.slot_bet)
-                    await bot.editMessageText(`Ваш выигрыш ${winBet}$ \nВы виграли 20% от ставки`, {
-                        chat_id: chatId,
-                        message_id: messageId,
-                    });
-                }
-                else if (p10Win.includes(diceValue)) {
-                    winBet = user.game_info.slot_bet * 0.1
-                    console.log(winBet)
-                    winBet = parseToNum(winBet)
+                        user.profile.balance = user.profile.balance - user.game_info.slot_bet
+                        user.profile.balance = user.profile.balance + winBet
+                        user.profile.balance = parseToNum(user.profile.balance)
 
-                    user.profile.balance = user.profile.balance - user.game_info.slot_bet
-                    user.profile.balance = user.profile.balance + winBet
-                    user.profile.balance = parseToNum(user.profile.balance)
+                        user.balance.m_spend = user.balance.m_spend + user.game_info.slot_bet
+                        user.balance.m_spend = parseToNum(user.balance.m_spend)
 
-                    user.balance.m_spend = user.balance.m_spend + user.game_info.slot_bet
-                    user.balance.m_spend = parseToNum(user.balance.m_spend)
+                        user.game_info.slot_game_win = user.game_info.slot_game_win + winBet
+                        user.game_info.slot_game_win = parseToNum(user.game_info.slot_game_win)
+                        user.game_info.slot_game_loss = user.game_info.slot_game_loss + user.game_info.slot_bet
+                        user.game_info.slot_game_loss = parseToNum(user.game_info.slot_game_loss)
 
-                    user.game_info.slot_game_win = user.game_info.slot_game_win + winBet
-                    user.game_info.slot_game_win = parseToNum(user.game_info.slot_game_win)
-                    user.game_info.slot_game_loss = user.game_info.slot_game_loss + user.game_info.slot_bet
-                    user.game_info.slot_game_loss = parseToNum(user.game_info.slot_game_loss)
+                        if (user.referral_info.referral_who_invited_id != '') {
+                            referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + user.game_info.slot_bet
+                            referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
+                            referralUser.save()
+                        }
 
-                    if( user.referral_info.referral_who_invited_id != '') {
-                        referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + user.game_info.slot_bet
-                        referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
-                        referralUser.save()
+                        user.balance.spend = user.balance.spend + user.game_info.slot_bet
+                        user.balance.spend = parseInt(user.balance.spend)
+                        user.game_info.slot_game_played += 1
+                        user.save()
+
+                        console.log(winBet, user.game_info.slot_bet)
+                        await bot.editMessageText(`Ваш выигрыш ${winBet}$ \nВы Выиграли 10% от ставки`, {
+                            chat_id: chatId,
+                            message_id: messageId,
+                        });
+
                     }
-                    
-                    user.balance.spend = user.balance.spend + user.game_info.slot_bet
-                    user.balance.spend = parseInt(user.balance.spend )
-                    user.game_info.slot_game_played += 1
-                    user.save()
-
-                    console.log(winBet, user.game_info.slot_bet)
-                    await bot.editMessageText(`Ваш выигрыш ${winBet}$ \nВы Выиграли 10% от ставки`, {
-                        chat_id: chatId,
-                        message_id: messageId,
-                    });
-
-                }
-            })
-            .catch((error) => {
-                console.error('Ошибка при отправке анимированного эмодзи:', error);
-            })
-            .finally(async ()=> {
-                await bot.sendMessage(chatId, slotsGameMessage(languageState, user, user.game_info.slot_bet), {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: '-', callback_data: 'slot_game_minus' },
-                                { text: betButton(user.game_info.slot_bet), callback_data: 'slot_game_____' },
-                                { text: '+', callback_data: 'slot_game_plus' },
-                            ],
-                            [
-
-                                { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
-                                { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
-                                { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
-                            ],
-                            [
-
-                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
-                                { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
-                            ],
-                        ],
-                    }
-
                 })
-            })
+                .catch((error) => {
+                    console.error('Ошибка при отправке анимированного эмодзи:', error);
+                })
+                .finally(async () => {
+                    await bot.sendMessage(chatId, slotsGameMessage(languageState, user, user.game_info.slot_bet), {
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: '-', callback_data: 'slot_game_minus' },
+                                    { text: betButton(user.game_info.slot_bet), callback_data: 'slot_game_____' },
+                                    { text: '+', callback_data: 'slot_game_plus' },
+                                ],
+                                [
+
+                                    { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
+                                    { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
+                                    { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
+                                ],
+                                [
+
+                                    { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
+                                    { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
+                                ],
+                            ],
+                        }
+
+                    })
+                })
 
         }
     }
@@ -1240,7 +1237,22 @@ bot.on('callback_query', async (query) => {
 ${translate[a].games.dice.message}
         `;
     };
+    const diceBetMessage = (a, b, c) => {
+        return `
+${translate[a].games.dice.message}
+${b.game_info.dice_bet} $
+        `;
+    };
+    let betButton = (bet) => {
+        if (typeof bet === 'number') {
+            return `${bet.toFixed(2)} $`;
+        } else {
 
+            bet = parseFloat(bet)
+            bet = bet.toFixed(2)
+            return bet;
+        }
+    };
     // user.game_info.dice_bet
     // positions
     const position1 = [1];
@@ -1254,8 +1266,10 @@ ${translate[a].games.dice.message}
     const position56 = [5, 6];
     const positionOdd = [1, 3, 5];
     const positionEven = [2, 4, 6];
-    
-    
+
+    // new dice bet
+    let newDiceBet;
+
     if (query.data === 'dice') {
         await bot.editMessageText(translate[languageState].games.dice.message, {
             chat_id: chatId,
@@ -1270,16 +1284,16 @@ ${translate[a].games.dice.message}
             reply_markup: gamesOptions(languageState).reply_markup,
         });
     }
-    else if (query.data === 'dice_st') {
-        await bot.editMessageText(profile(languageState, user), {
-            chat_id: chatId,
-            message_id: messageId,
-            reply_markup: gamesOptions(languageState).reply_markup,
-        });
-    
-        
-    
-    }
+    // else if (query.data === 'dice_st') {
+    //     await bot.editMessageText(profile(languageState, user), {
+    //         chat_id: chatId,
+    //         message_id: messageId,
+    //         reply_markup: gamesOptions(languageState).reply_markup,
+    //     });
+
+
+
+    // }
     else if (query.data === 'dice_game_back') {
         user.game_info.dice_game_position = [];
         user.save()
@@ -1290,15 +1304,853 @@ ${translate[a].games.dice.message}
         })
     }
     else if (query.data === "dice_nd") {
-        console.log(
-            'dice_nd'
-        )
         await bot.editMessageText(diceGameMessage(languageState), {
             chat_id: chatId,
             message_id: messageId,
             reply_markup: {
-                inline_keyboard : [
-                    [ 
+                inline_keyboard: [
+                    [
+                        { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },
+                    ],
+                    [
+                        { text: 1, callback_data: 'dice_game_bet_on_1' },
+                        { text: 2, callback_data: 'dice_game_bet_on_2' },
+                        { text: 3, callback_data: 'dice_game_bet_on_3' },
+                        { text: 4, callback_data: 'dice_game_bet_on_4' },
+                        { text: 5, callback_data: 'dice_game_bet_on_5' },
+                        { text: 6, callback_data: 'dice_game_bet_on_6' },
+                    ],
+                    [
+                        { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                        { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                        { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                    ],
+                    [
+                        { text: translate[languageState].games.dice.odd, callback_data: 'dice_game_bet_on_odd' },
+                        { text: translate[languageState].games.dice.even, callback_data: 'dice_game_bet_on_even' },
+                    ],
+                    [
+                        { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                        { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                    ],
+                ]
+            },
+        });
+    }
+    else if (query.data === 'dice_game_bet_on_1') {
+        switch (user.game_info.dice_bet) {
+            case position1:
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },
+                            ],
+                            [
+                                { text: '1 ✅', callback_data: 'foobar' },
+                                { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+            default:
+                user.game_info.dice_game_position = position1;
+                user.save();
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1 ✅', callback_data: 'foobar' },
+                                { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+        }
+    }
+    else if (query.data === 'dice_game_bet_on_2') {
+        switch (user.game_info.dice_bet) {
+            case position2:
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: '2 ✅', callback_data: 'foobar' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+            default:
+                user.game_info.dice_game_position = position2;
+                user.save();
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: '2 ✅', callback_data: 'foobar' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+        }
+    }
+    else if (query.data === 'dice_game_bet_on_3') {
+        switch (user.game_info.dice_bet) {
+            case position3:
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                { text: '3 ✅', callback_data: 'foobar' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+            default:
+                user.game_info.dice_game_position = position3;
+                user.save();
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                { text: '3 ✅', callback_data: 'foobar' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+        }
+    }
+    else if (query.data === 'dice_game_bet_on_4') {
+        switch (user.game_info.dice_bet) {
+            case position4:
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4 ✅', callback_data: 'foobar' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+            default:
+                user.game_info.dice_game_position = position4;
+                user.save();
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4 ✅', callback_data: 'foobar' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+        }
+    }
+    else if (query.data === 'dice_game_bet_on_5') {
+        switch (user.game_info.dice_bet) {
+            case position5:
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5 ✅', callback_data: 'foobar' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+            default:
+                user.game_info.dice_game_position = position5;
+                user.save();
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5 ✅', callback_data: 'foobar' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+        }
+    }
+    else if (query.data === 'dice_game_bet_on_6') {
+        switch (user.game_info.dice_bet) {
+            case position6:
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: 2, callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6 ✅', callback_data: 'foobar' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+            default:
+                user.game_info.dice_game_position = position6;
+                user.save();
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: 2, callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6 ✅', callback_data: 'foobar' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+        }
+    }
+    else if (query.data === 'dice_game_bet_on_1_2') {
+        switch (user.game_info.dice_bet) {
+            case position12:
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: 2, callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2 ✅', callback_data: 'foobar' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+            default:
+                user.game_info.dice_game_position = position12;
+                user.save();
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: 2, callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2 ✅', callback_data: 'foobar' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+        }
+    }
+    else if (query.data === 'dice_game_bet_on_3_4') {
+        switch (user.game_info.dice_bet) {
+            case position34:
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: 2, callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4 ✅', callback_data: 'foobar' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+            default:
+                user.game_info.dice_game_position = position34;
+                user.save();
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: 2, callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4 ✅', callback_data: 'foobar' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+        }
+    }
+    else if (query.data === 'dice_game_bet_on_5_6') {
+        switch (user.game_info.dice_bet) {
+            case position56:
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6 ✅', callback_data: 'foobar' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+            default:
+                user.game_info.dice_game_position = position56;
+                user.save();
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6 ✅', callback_data: 'foobar' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+        }
+    }
+    else if (query.data === 'dice_game_bet_on_odd') {
+        switch (user.game_info.dice_bet) {
+            case positionOdd:
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd} ✅`, callback_data: 'foobar' },
+                                { text: translate[languageState].games.dice.even, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+            default:
+                user.game_info.dice_game_position = positionOdd;
+                user.save();
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd} ✅`, callback_data: 'foobar' },
+                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+        }
+    }
+    else if (query.data === 'dice_game_bet_on_even') {
+        switch (user.game_info.dice_bet) {
+            case positionEven:
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_1_2' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_4_5' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even} ✅`, callback_data: 'foobar' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+            default:
+                user.game_info.dice_game_position = positionEven;
+                user.save();
+                await bot.editMessageText(diceGameMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                            [
+                                { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                { text: '6', callback_data: 'dice_game_bet_on_1_2' },
+                            ],
+                            [
+                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                            ],
+                            [
+                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                { text: `${translate[languageState].games.dice.even} ✅`, callback_data: 'foobar' },
+                            ],
+                            [
+                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
+                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
+                            ],
+                        ]
+                    },
+                });
+                break;
+        }
+    }
+    else if (query.data === 'dice_game_bet_value_') {
+        if (user.profile.balance < 0.1) {
+            await bot.editMessageText(diceBetMessage(languageState, user), {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: slotLowBalance(languageState).reply_markup,
+            });
+        }
+        else {
+            await bot.editMessageText(diceBetMessage(languageState, user), {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            { text: '-', callback_data: 'dice_bet_minus' },
+                            { text: betButton(user.game_info.dice_bet), callback_data: 'dice_bet_____' },
+                            { text: '+', callback_data: 'dice_bet_plus' },
+                        ],
+                        [
+
+                            { text: translate[languageState].games.slots.min, callback_data: 'dice_bet_min' },
+                            { text: translate[languageState].games.slots.double, callback_data: 'dice_bet_double' },
+                            { text: translate[languageState].games.slots.max, callback_data: 'dice_bet_max' },
+                        ],
+                        [
+
+                            { text: translate[languageState].games.slots.slot_game_back, callback_data: 'dice_bet_back' },
+                        ],
+                    ],
+                },
+            });
+        };
+    }
+    // dice bet config
+    else if (query.data === 'dice_bet_back') {
+        await bot.editMessageText(diceGameMessage(languageState), {
+            chat_id: chatId,
+            message_id: messageId,
+            reply_markup: {
+                inline_keyboard: [
+                    [
                         { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },
                     ],
                     [
@@ -1326,1371 +2178,728 @@ ${translate[a].games.dice.message}
             },
         });
     }
-    else if (query.data === 'dice_game_bet_on_1') {
+    else if (query.data === 'dice_bet_minus') {
         switch (user.game_info.dice_bet) {
-            case position1:
-                await bot.editMessageText(diceGameMessage(languageState), {
+            case dice_bet = 0.1:
+                await bot.editMessageText(diceBetMessage(languageState, user), {
                     chat_id: chatId,
                     message_id: messageId,
                     reply_markup: {
-                        inline_keyboard : [
-                            [ 
-                                { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },
+                        inline_keyboard: [
+                            [
+                                { text: '-', callback_data: 'foobar' },
+                                { text: betButton(user.game_info.dice_bet), callback_data: 'dice_bet_____' },
+                                { text: '+', callback_data: 'dice_bet_plus' },
                             ],
                             [
-                                { text: '1 ✅', callback_data: 'foobar' },
-                                { text: '2', callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'dice_bet_min' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'dice_bet_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'dice_bet_double' },
                             ],
                             [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'dice_bet_back' },
                             ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
+                        ],
                     },
                 });
-            break;
-            default : 
-                user.game_info.dice_game_position = position1;
-                user.save();
-                await bot.editMessageText(diceGameMessage(languageState), {
+                break;
+            default:
+                newDiceBet = user.game_info.dice_bet
+                newDiceBet = newDiceBet - 0.1
+                newDiceBet = parseFloat(newDiceBet)
+                newDiceBet = newDiceBet.toFixed(2)
+                user.game_info.dice_bet = parseFloat(newDiceBet)
+                user.save()
+                await bot.editMessageText(diceBetMessage(languageState, user), {
                     chat_id: chatId,
                     message_id: messageId,
                     reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
+                        inline_keyboard: [
                             [
-                                { text: '1 ✅', callback_data: 'foobar' },
-                                { text: '2', callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
+                                { text: '-', callback_data: 'dice_bet_minus' },
+                                { text: betButton(user.game_info.dice_bet), callback_data: 'dice_bet_____' },
+                                { text: '+', callback_data: 'dice_bet_plus' },
                             ],
                             [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'dice_bet_min' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'dice_bet_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'dice_bet_max' },
                             ],
                             [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'dice_bet_back' },
                             ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
+                        ],
                     },
                 });
-            break;
+                break;
+        };
+    }
+    else if (query.data === 'dice_bet_plus') {
+        switch (user.game_info.dice_bet) {
+            case dice_bet = 100:
+                await bot.editMessageText(diceBetMessage(languageState, user), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: '-', callback_data: 'dice_bet_minus' },
+                                { text: betButton(user.game_info.dice_bet), callback_data: 'dice_bet_____' },
+                                { text: '+', callback_data: 'foobar' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'dice_bet_min' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'dice_bet_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'dice_bet_max' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'dice_bet_back' },
+                            ],
+                        ],
+                    },
+                });
+                break;
+            default:
+                newDiceBet = user.game_info.dice_bet
+                newDiceBet = newDiceBet + 0.1
+                newDiceBet = parseFloat(newDiceBet)
+                newDiceBet = newDiceBet.toFixed(2)
+                user.game_info.dice_bet = parseFloat(newDiceBet)
+                user.save()
+                await bot.editMessageText(diceBetMessage(languageState, user), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: '-', callback_data: 'dice_bet_minus' },
+                                { text: betButton(user.game_info.dice_bet), callback_data: 'dice_bet_____' },
+                                { text: '+', callback_data: 'dice_bet_plus' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'dice_bet_min' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'dice_bet_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'dice_bet_max' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'dice_bet_back' },
+                            ],
+                        ],
+                    },
+                });
+                break;
+        };
+    }
+    else if (query.data === 'dice_bet_min') {
+        switch (user.game_info.dice_bet) {
+            case 0.1:
+                await bot.editMessageText(diceBetMessage(languageState, user), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: '-', callback_data: 'dice_bet_minus' },
+                                { text: betButton(user.game_info.dice_bet), callback_data: 'slot_game_____' },
+                                { text: '+', callback_data: 'dice_bet_plus' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'foobar' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'dice_bet_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'dice_bet_max' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'dice_bet_back' },
+                            ],
+                        ],
+                    },
+                });
+                break;
+            default:
+                newDiceBet = user.game_info.dice_bet
+                newDiceBet = 0.1
+                newDiceBet = parseFloat(newDiceBet)
+                newDiceBet = newDiceBet.toFixed(2)
+                user.game_info.dice_bet = parseFloat(newDiceBet)
+                user.save()
+                await bot.editMessageText(diceBetMessage(languageState, user), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: '-', callback_data: 'dice_bet_minus' },
+                                { text: betButton(user.game_info.dice_bet), callback_data: 'slot_game_____' },
+                                { text: '+', callback_data: 'dice_bet_plus' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'dice_bet_min' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'dice_bet_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'dice_bet_max' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'dice_bet_back' },
+                            ],
+                        ],
+                    },
+                });
+                break;
+        };
+    }
+    else if (query.data === 'dice_bet_double') {
+        if (user.game_info.dice_bet > 50) {
+            console.log(123)
+
+            console.log(user)
+            await bot.editMessageText(diceBetMessage(languageState, user), {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            { text: '-', callback_data: 'dice_bet_minus' },
+                            { text: betButton(user.game_info.dice_bet), callback_data: 'slot_game_____' },
+                            { text: '+', callback_data: 'dice_bet_plus' },
+                        ],
+                        [
+
+                            { text: translate[languageState].games.slots.min, callback_data: 'dice_bet_min' },
+                            { text: translate[languageState].games.slots.double, callback_data: 'foobar' },
+                            { text: translate[languageState].games.slots.max, callback_data: 'dice_bet_max' },
+                        ],
+                        [
+
+                            { text: translate[languageState].games.slots.slot_game_back, callback_data: 'dice_bet_back' },
+                        ],
+                    ],
+                },
+            });
+        }
+        else {
+            console.log(user)
+            newDiceBet = user.game_info.dice_bet
+            newDiceBet = newDiceBet * 2
+            newDiceBet = parseFloat(newDiceBet)
+            newDiceBet = newDiceBet.toFixed(2)
+            user.game_info.dice_bet = parseFloat(newDiceBet)
+            user.save()
+            await bot.editMessageText(diceBetMessage(languageState, user), {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            { text: '-', callback_data: 'dice_bet_minus' },
+                            { text: betButton(user.game_info.dice_bet), callback_data: 'slot_game_____' },
+                            { text: '+', callback_data: 'dice_bet_plus' },
+                        ],
+                        [
+
+                            { text: translate[languageState].games.slots.min, callback_data: 'dice_bet_min' },
+                            { text: translate[languageState].games.slots.double, callback_data: 'dice_bet_double' },
+                            { text: translate[languageState].games.slots.max, callback_data: 'dice_bet_max' },
+                        ],
+                        [
+
+                            { text: translate[languageState].games.slots.slot_game_back, callback_data: 'dice_bet_back' },
+                        ],
+                    ],
+                },
+            });
+        }
+
+    }
+    else if (query.data === 'dice_bet_max') {
+        switch (user.game_info.dice_bet) {
+            case dice_bet = 100:
+                await bot.editMessageText(diceBetMessage(languageState, user), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: '-', callback_data: 'dice_bet_minus' },
+                                { text: betButton(user.game_info.dice_bet), callback_data: 'slot_game_____' },
+                                { text: '+', callback_data: 'dice_bet_plus' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'dice_bet_min' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'dice_bet_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'foobar' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'dice_bet_back' },
+                            ],
+                        ],
+                    },
+                });
+                break;
+            default:
+                newDiceBet = user.game_info.dice_bet
+                newDiceBet = 100
+                newDiceBet = parseFloat(newDiceBet)
+                newDiceBet = newDiceBet.toFixed(2)
+                user.game_info.dice_bet = parseFloat(newDiceBet)
+                user.save()
+                await bot.editMessageText(diceBetMessage(languageState, user), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: '-', callback_data: 'dice_bet_minus' },
+                                { text: betButton(user.game_info.dice_bet), callback_data: 'slot_game_____' },
+                                { text: '+', callback_data: 'dice_bet_plus' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'dice_bet_min' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'dice_bet_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'dice_bet_max' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'dice_bet_back' },
+                            ],
+                        ],
+                    },
+                });
+                break;
+        };
+    }
+    else if (query.data === 'dice_game_play') {
+        if (user.game_info.dice_bet > user.profile.balance) {
+            bot.sendMessage(chatId, '[**No balance]', deleteMessage);
+        }
+        else {
+            let user = await allUsers.findOne({ _id: chatId });
+            let referralUser = await allUsers.findOne({ _id: user.referral_info.referral_who_invited_id })
+            // win bet
+            // console.log(referralUser)
+            console.log(user)
+            // let winBet
+            // // emoji
+            const emoji = `🎲️`
+            // //
+            let diceWinBet
+
+            const reply_markupOtions = (b, c) => {
+                let result = {}
+                if (b.game_info.dice_game_position =  position1) {
+                    result = {
+                        reply_markup:
+                        {
+                            inline_keyboard: [
+                                [
+                                    { text: `${translate[c].games.dice.bet}: ${b.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },
+                                ],
+                                [
+                                    { text: '1 ✅', callback_data: 'foobar' },
+                                    { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                    { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                    { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                    { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                    { text: '6', callback_data: 'dice_game_bet_on_6' },
+                                ],
+                                [
+                                    { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                    { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                    { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                                ],
+                                [
+                                    { text: `${translate[c].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                    { text: `${translate[c].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                                ],
+                                [
+                                    { text: translate[c].games.dice.back, callback_data: 'dice_game_back' },
+                                    { text: translate[c].games.dice.throw, callback_data: 'dice_game_play' },
+                                ],
+                            ]
+                        }
+                    }
+                }
+                else if (b.game_info.dice_game_position  = position2) {
+                    result =  {
+                        reply_markup:
+                        {
+                            inline_keyboard: [
+                                [
+                                    { text: `${translate[c].games.dice.bet}: ${b.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },
+                                ],
+                                [
+                                    { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                    { text: '2 ✅', callback_data: 'foobar' },
+                                    { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                    { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                    { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                    { text: '6', callback_data: 'dice_game_bet_on_6' },
+                                ],
+                                [
+                                    { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                    { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                    { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                                ],
+                                [
+                                    { text: `${translate[c].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                    { text: `${translate[c].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                                ],
+                                [
+                                    { text: translate[c].games.dice.back, callback_data: 'dice_game_back' },
+                                    { text: translate[c].games.dice.throw, callback_data: 'dice_game_play' },
+                                ],
+                            ]
+                        }
+                    }
+                }
+                else if (b.game_info.dice_game_position  = position3) {
+                    result =  {
+                        reply_markup:
+                        {
+                            inline_keyboard: [
+                                [
+                                    { text: `${translate[c].games.dice.bet}: ${b.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },
+                                ],
+                                [
+                                    { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                    { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                    { text: '3 ✅', callback_data: 'foobar' },
+                                    { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                    { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                    { text: '6', callback_data: 'dice_game_bet_on_6' },
+                                ],
+                                [
+                                    { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                    { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                    { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                                ],
+                                [
+                                    { text: `${translate[c].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                    { text: `${translate[c].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                                ],
+                                [
+                                    { text: translate[c].games.dice.back, callback_data: 'dice_game_back' },
+                                    { text: translate[c].games.dice.throw, callback_data: 'dice_game_play' },
+                                ],
+                            ]
+                        }
+                    }
+                }
+                else if (b.game_info.dice_game_position = position4) {
+                    result =  {
+                        reply_markup:
+                        {
+                            inline_keyboard: [
+                                [
+                                    { text: `${translate[c].games.dice.bet}: ${b.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },
+                                ],
+                                [
+                                    { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                    { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                    { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                    { text: '4 ✅', callback_data: 'foobar' },
+                                    { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                    { text: '6', callback_data: 'dice_game_bet_on_6' },
+                                ],
+                                [
+                                    { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                    { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                    { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                                ],
+                                [
+                                    { text: `${translate[c].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                    { text: `${translate[c].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                                ],
+                                [
+                                    { text: translate[c].games.dice.back, callback_data: 'dice_game_back' },
+                                    { text: translate[c].games.dice.throw, callback_data: 'dice_game_play' },
+                                ],
+                            ]
+                        }
+                    }
+                }
+                else if (b.game_info.dice_game_position  = position5) {
+                    result =  {
+                        reply_markup:
+                        {
+                            inline_keyboard: [
+                                [
+                                    { text: `${translate[c].games.dice.bet}: ${b.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },
+                                ],
+                                [
+                                    { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                    { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                    { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                    { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                    { text: '5 ✅', callback_data: 'foobar' },
+                                    { text: '6', callback_data: 'dice_game_bet_on_6' },
+                                ],
+                                [
+                                    { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                    { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                    { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                                ],
+                                [
+                                    { text: `${translate[c].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                    { text: `${translate[c].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                                ],
+                                [
+                                    { text: translate[c].games.dice.back, callback_data: 'dice_game_back' },
+                                    { text: translate[c].games.dice.throw, callback_data: 'dice_game_play' },
+                                ],
+                            ]
+                        }
+                    }
+                }
+                else if (b.game_info.dice_game_position  = position6) {
+                    result =  {
+                        reply_markup:
+                        {
+                            inline_keyboard: [
+                                [
+                                    { text: `${translate[c].games.dice.bet}: ${b.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },
+                                ],
+                                [
+                                    { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                    { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                    { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                    { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                    { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                    { text: '6 ✅', callback_data: 'foobar' },
+                                ],
+                                [
+                                    { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                    { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                    { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                                ],
+                                [
+                                    { text: `${translate[c].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                    { text: `${translate[c].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                                ],
+                                [
+                                    { text: translate[c].games.dice.back, callback_data: 'dice_game_back' },
+                                    { text: translate[c].games.dice.throw, callback_data: 'dice_game_play' },
+                                ],
+                            ]
+                        }
+                    }
+                }
+                else if (b.game_info.dice_game_position  = position12) {
+                    result =  {
+                        reply_markup:
+                        {
+                            inline_keyboard: [
+                                [
+                                    { text: `${translate[c].games.dice.bet}: ${b.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },
+                                ],
+                                [
+                                    { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                    { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                    { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                    { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                    { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                    { text: '6', callback_data: 'dice_game_bet_on_6' },
+                                ],
+                                [
+                                    { text: '1-2 ✅', callback_data: 'foobar' },
+                                    { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                    { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                                ],
+                                [
+                                    { text: `${translate[c].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                    { text: `${translate[c].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                                ],
+                                [
+                                    { text: translate[c].games.dice.back, callback_data: 'dice_game_back' },
+                                    { text: translate[c].games.dice.throw, callback_data: 'dice_game_play' },
+                                ],
+                            ]
+                        }
+                    }
+                }
+                else if (b.game_info.dice_game_position  = position34) {
+                    result =  {
+                        reply_markup:
+                        {
+                            inline_keyboard: [
+                                [
+                                    { text: `${translate[c].games.dice.bet}: ${b.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },
+                                ],
+                                [
+                                    { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                    { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                    { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                    { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                    { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                    { text: '6', callback_data: 'dice_game_bet_on_6' },
+                                ],
+                                [
+                                    { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                    { text: '3-4 ✅', callback_data: 'foobar' },
+                                    { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                                ],
+                                [
+                                    { text: `${translate[c].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                    { text: `${translate[c].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                                ],
+                                [
+                                    { text: translate[c].games.dice.back, callback_data: 'dice_game_back' },
+                                    { text: translate[c].games.dice.throw, callback_data: 'dice_game_play' },
+                                ],
+                            ]
+                        }
+                    }
+                }
+                else if (b.game_info.dice_game_position  = position56) {
+                    result =  {
+                        reply_markup:
+                        {
+                            inline_keyboard: [
+                                [
+                                    { text: `${translate[c].games.dice.bet}: ${b.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },
+                                ],
+                                [
+                                    { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                    { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                    { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                    { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                    { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                    { text: '6', callback_data: 'dice_game_bet_on_6' },
+                                ],
+                                [
+                                    { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                    { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                    { text: '5-6 ✅', callback_data: 'foobar' },
+                                ],
+                                [
+                                    { text: `${translate[c].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                    { text: `${translate[c].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                                ],
+                                [
+                                    { text: translate[c].games.dice.back, callback_data: 'dice_game_back' },
+                                    { text: translate[c].games.dice.throw, callback_data: 'dice_game_play' },
+                                ],
+                            ]
+                        }
+                    }
+                }
+                else if (b.game_info.dice_game_position  = positionOdd) {
+                    result =  {
+                        reply_markup:
+                        {
+                            inline_keyboard: [
+                                [
+                                    { text: `${translate[c].games.dice.bet}: ${b.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },
+                                ],
+                                [
+                                    { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                    { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                    { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                    { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                    { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                    { text: '6', callback_data: 'dice_game_bet_on_6' },
+                                ],
+                                [
+                                    { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                    { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                    { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                                ],
+                                [
+                                    { text: `${translate[c].games.dice.odd} ✅`, callback_data: 'foobar' },
+                                    { text: `${translate[c].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
+                                ],
+                                [
+                                    { text: translate[c].games.dice.back, callback_data: 'dice_game_back' },
+                                    { text: translate[c].games.dice.throw, callback_data: 'dice_game_play' },
+                                ],
+                            ]
+                        }
+                    }
+                }
+                else if (b.game_info.dice_game_position  = positionEven) {
+                    result =  {
+                        reply_markup:
+                        {
+                            inline_keyboard: [
+                                [
+                                    { text: `${translate[c].games.dice.bet}: ${b.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },
+                                ],
+                                [
+                                    { text: '1', callback_data: 'dice_game_bet_on_1' },
+                                    { text: '2', callback_data: 'dice_game_bet_on_2' },
+                                    { text: '3', callback_data: 'dice_game_bet_on_3' },
+                                    { text: '4', callback_data: 'dice_game_bet_on_4' },
+                                    { text: '5', callback_data: 'dice_game_bet_on_5' },
+                                    { text: '6', callback_data: 'dice_game_bet_on_6' },
+                                ],
+                                [
+                                    { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
+                                    { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
+                                    { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
+                                ],
+                                [
+                                    { text: `${translate[c].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
+                                    { text: `${translate[c].games.dice.even} ✅`, callback_data: 'foobar' },
+                                ],
+                                [
+                                    { text: translate[c].games.dice.back, callback_data: 'dice_game_back' },
+                                    { text: translate[c].games.dice.throw, callback_data: 'dice_game_play' },
+                                ],
+                            ]
+                        }
+                    }
+                }
+                return result 
+            }
+
+
+
+            bot.editMessageText('...', {
+                chat_id: chatId,
+                message_id: messageId,
+            });
+
+
+            let reply_markupOtions__RESULT = reply_markupOtions(user, languageState)
+
+            console.log(reply_markupOtions(user, languageState))
+            console.log(reply_markupOtions__RESULT)
+
+            await bot.sendDice(chatId, { emoji })
+                .then(async (response) => {
+                    const diceValue = response.dice.value;
+                    const dice_game_position = user.game_info.dice_game_position;
+                    if (dice_game_position.includes(diceValue)) {
+                        console.log("You win")
+                    }
+                })
+                .catch((error) => {
+                    console.error('Ошибка при отправке анимированного эмодзи:', error);
+                })
+                .finally(async () => {
+                    const dice_game_position = user.game_info.dice_game_position
+
+
+
+
+                    await bot.sendMessage(chatId, diceGameMessage(languageState), reply_markupOtions(user, languageState))
+                })
+
         }
     }
-    else if (query.data === 'dice_game_bet_on_2') {
-        switch (user.game_info.dice_bet) {
-            case position2:
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: '2 ✅', callback_data: 'foobar' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-            default : 
-                user.game_info.dice_game_position = position2;
-                user.save();
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: '2 ✅', callback_data: 'foobar' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-        }
-    }
-    else if (query.data === 'dice_game_bet_on_3') {
-        switch (user.game_info.dice_bet) {
-            case position3:
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: '2', callback_data: 'dice_game_bet_on_2' },
-                                { text: '3 ✅', callback_data: 'foobar' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-            default : 
-                user.game_info.dice_game_position = position3;
-                user.save();
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: '2', callback_data: 'dice_game_bet_on_2' },
-                                { text: '3 ✅', callback_data: 'foobar' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-        }
-    }
-    else if (query.data === 'dice_game_bet_on_4') {
-        switch (user.game_info.dice_bet) {
-            case position4:
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: '2', callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4 ✅', callback_data: 'foobar' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-            default : 
-                user.game_info.dice_game_position = position4;
-                user.save();
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: '2', callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4 ✅', callback_data: 'foobar' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-        }
-    }
-    else if (query.data === 'dice_game_bet_on_5') {
-        switch (user.game_info.dice_bet) {
-            case position5:
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: '2', callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5 ✅', callback_data: 'foobar' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-            default : 
-                user.game_info.dice_game_position = position5;
-                user.save();
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: '2', callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5 ✅', callback_data: 'foobar' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-        }
-    }
-    else if (query.data === 'dice_game_bet_on_6') {
-        switch (user.game_info.dice_bet) {
-            case position6:
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: 2, callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6 ✅', callback_data: 'foobar' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-            default : 
-                user.game_info.dice_game_position = position6;
-                user.save();
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: 2, callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6 ✅', callback_data: 'foobar' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-        }
-    }
-    else if (query.data === 'dice_game_bet_on_1_2') {
-        switch (user.game_info.dice_bet) {
-            case position12:
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: 2, callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2 ✅', callback_data: 'foobar' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-            default : 
-                user.game_info.dice_game_position = position12;
-                user.save();
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: 2, callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2 ✅', callback_data: 'foobar' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-        }
-    }
-    else if (query.data === 'dice_game_bet_on_3_4') {
-        switch (user.game_info.dice_bet) {
-            case position34:
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: 2, callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4 ✅', callback_data: 'foobar' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-            default : 
-                user.game_info.dice_game_position = position34;
-                user.save();
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: 2, callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4 ✅', callback_data: 'foobar' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-        }
-    }
-    else if (query.data === 'dice_game_bet_on_5_6') {
-        switch (user.game_info.dice_bet) {
-            case position56:
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: '2', callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6 ✅', callback_data: 'foobar' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-            default : 
-                user.game_info.dice_game_position = position56;
-                user.save();
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: '2', callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6 ✅', callback_data: 'foobar' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-        }
-    }
-    else if (query.data === 'dice_game_bet_on_odd') {
-        switch (user.game_info.dice_bet) {
-            case positionOdd:
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: '2', callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd} ✅`, callback_data: 'foobar' },
-                                { text: translate[languageState].games.dice.even, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-            default : 
-                user.game_info.dice_game_position = positionOdd;
-                user.save();
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: '2', callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_6' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd} ✅`, callback_data: 'foobar' },
-                                { text: `${translate[languageState].games.dice.even}`, callback_data: 'dice_game_bet_on_even' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-        }
-    }
-    else if (query.data === 'dice_game_bet_on_even') {
-        switch (user.game_info.dice_bet) {
-            case positionEven:
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: '2', callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_1_2' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_4_5' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even} ✅`, callback_data: 'foobar' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-            default : 
-                user.game_info.dice_game_position = positionEven;
-                user.save();
-                await bot.editMessageText(diceGameMessage(languageState), {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: {
-                        inline_keyboard : [
-                            [ { text: `${translate[languageState].games.dice.bet}: ${user.game_info.dice_bet} $`, callback_data: 'dice_game_bet_value_' },],
-                            [
-                                { text: '1', callback_data: 'dice_game_bet_on_1' },
-                                { text: '2', callback_data: 'dice_game_bet_on_2' },
-                                { text: '3', callback_data: 'dice_game_bet_on_3' },
-                                { text: '4', callback_data: 'dice_game_bet_on_4' },
-                                { text: '5', callback_data: 'dice_game_bet_on_5' },
-                                { text: '6', callback_data: 'dice_game_bet_on_1_2' },
-                            ],
-                            [
-                                { text: '1-2', callback_data: 'dice_game_bet_on_1_2' },
-                                { text: '3-4', callback_data: 'dice_game_bet_on_3_4' },
-                                { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
-                            ],
-                            [
-                                { text: `${translate[languageState].games.dice.odd}`, callback_data: 'dice_game_bet_on_odd' },
-                                { text: `${translate[languageState].games.dice.even} ✅`, callback_data: 'foobar' },
-                            ],
-                            [
-                                { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
-                                { text: translate[languageState].games.dice.throw, callback_data: 'dice_game_play' },
-                            ],
-                        ]
-                    },
-                });
-            break;
-        }
-    }
-
-
-    
-
-    // slotsGameMessage = (a, b, c) => {
-    //     return `
-    // ${translate[a].games.slots.message}
-
-    // ${translate[a].profile.balance} : ${b.profile.balance} $
-
-    // ${translate[a].games.slots.bet} : ${c} $
-    //     `;
-    // };
-    // slotsGameMessageBetIsTooBig = (a, b) => {
-    //     return `
-    // ${translate[a].games.slots.bet_is_too_big}
-    //     `;
-    // };
-    // slotsGameMessageBetIsTooSmall = (a, b) => {
-    //     return `
-    // ${translate[a].games.slots.bet_is_too_small}
-    //     `;
-    // };
-    // lowBalanceMessage = (a, b) => {
-    //     return `
-    // ${translate[a].wallet.low_balance}
-    //     `;
-    // };
-    // let betButton = (bet) => {
-    //     if (typeof bet === 'number') {
-    //         return `${bet.toFixed(2)} $`;
-    //     } else {
-
-    //         bet = parseFloat(bet)
-    //         bet = bet.toFixed(2)
-    //         return bet;
-    //     }
-    // };
-
-    // newBet = bet;
-    // newBet = parseInt(newBet)
-
-    // // play
-    // if (query.data === 'slots_play') {
-    //     if (user.profile.balance < 0.1) {
-    //         await bot.editMessageText(lowBalanceMessage(languageState, user), {
-    //             chat_id: chatId,
-    //             message_id: messageId,
-    //             reply_markup: slotLowBalance(languageState).reply_markup,
-    //         });
-    //     }
-    //     else {
-    //         await bot.editMessageText(slotsGameMessage(languageState, user, bet), {
-    //             chat_id: chatId,
-    //             message_id: messageId,
-    //             reply_markup: {
-    //                 inline_keyboard: [
-    //                     [
-    //                         { text: '-', callback_data: 'slot_game_minus' },
-    //                         { text: betButton(bet), callback_data: 'slot_game_____' },
-    //                         { text: '+', callback_data: 'slot_game_plus' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
-    //                         { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
-    //                         { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
-    //                         { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
-    //                     ],
-    //                 ],
-    //             },
-    //         });
-    //     };
-    // }
-    // // minus button
-    // else if (query.data === 'slot_game_minus') {
-    //     if (bet <= 0.1) {
-    //         await bot.editMessageText(slotsGameMessageBetIsTooSmall(languageState), {
-    //             chat_id: chatId,
-    //             message_id: messageId,
-    //             reply_markup: {
-    //                 inline_keyboard: [
-    //                     [
-    //                         { text: '-', callback_data: 'foobar' },
-    //                         { text: betButton(bet), callback_data: 'slot_game_____' },
-    //                         { text: '+', callback_data: 'slot_game_plus' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
-    //                         { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
-    //                         { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
-    //                         { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
-    //                     ],
-    //                 ],
-    //             },
-    //         });
-    //     }
-    //     else {
-    //         newBet = bet
-
-    //         newBet = newBet - 0.1
-    //         newBet = parseFloat(newBet)
-    //         newBet = newBet.toFixed(2)
-
-    //         bet = parseFloat(newBet)
-
-    //         await bot.editMessageText(slotsGameMessage(languageState, user, bet), {
-    //             chat_id: chatId,
-    //             message_id: messageId,
-    //             reply_markup: {
-    //                 inline_keyboard: [
-    //                     [
-    //                         { text: '-', callback_data: 'slot_game_minus' },
-    //                         { text: betButton(bet), callback_data: 'slot_game_____' },
-    //                         { text: '+', callback_data: 'slot_game_plus' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
-    //                         { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
-    //                         { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
-    //                         { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
-    //                     ],
-    //                 ],
-    //             },
-    //         });
-
-    //     };
-    // }
-    // // plus button
-    // else if (query.data === 'slot_game_plus') {
-    //     if (bet >= 100) {
-    //         await bot.editMessageText(slotsGameMessageBetIsTooBig(languageState), {
-    //             chat_id: chatId,
-    //             message_id: messageId,
-    //             reply_markup: {
-    //                 inline_keyboard: [
-    //                     [
-    //                         { text: '-', callback_data: 'slot_game_minus' },
-    //                         { text: betButton(bet), callback_data: 'slot_game_____' },
-    //                         { text: '+', callback_data: 'foobar' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
-    //                         { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
-    //                         { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
-    //                         { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
-    //                     ],
-    //                 ],
-    //             },
-    //         });
-    //     }
-    //     else {
-    //         newBet = bet
-
-    //         newBet = newBet + 0.1
-    //         newBet = parseFloat(newBet)
-    //         newBet = newBet.toFixed(2)
-
-    //         bet = parseFloat(newBet)
-
-    //         await bot.editMessageText(slotsGameMessage(languageState, user, bet), {
-    //             chat_id: chatId,
-    //             message_id: messageId,
-    //             reply_markup: {
-    //                 inline_keyboard: [
-    //                     [
-    //                         { text: '-', callback_data: 'slot_game_minus' },
-    //                         { text: betButton(bet), callback_data: 'slot_game_____' },
-    //                         { text: '+', callback_data: 'slot_game_plus' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
-    //                         { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
-    //                         { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
-    //                         { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
-    //                     ],
-    //                 ],
-    //             },
-    //         });
-
-
-    //     };
-    // }
-    // // double button
-    // else if (query.data === 'slot_game_double') {
-    //     if (bet > 50) {
-    //         await bot.editMessageText(slotsGameMessageBetIsTooBig(languageState), {
-    //             chat_id: chatId,
-    //             message_id: messageId,
-    //             reply_markup: {
-    //                 inline_keyboard: [
-    //                     [
-    //                         { text: '-', callback_data: 'slot_game_minus' },
-    //                         { text: betButton(bet), callback_data: 'slot_game_____' },
-    //                         { text: '+', callback_data: 'foobar' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
-    //                         { text: translate[languageState].games.slots.double, callback_data: 'foobar' },
-    //                         { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
-    //                         { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
-    //                     ],
-    //                 ],
-    //             },
-    //         });
-    //     }
-    //     else {
-    //         newBet = bet
-
-    //         newBet = newBet * 2
-    //         newBet = parseFloat(newBet)
-    //         newBet = newBet.toFixed(2)
-
-    //         bet = parseFloat(newBet)
-
-    //         await bot.editMessageText(slotsGameMessage(languageState, user, bet), {
-    //             chat_id: chatId,
-    //             message_id: messageId,
-    //             reply_markup: {
-    //                 inline_keyboard: [
-    //                     [
-    //                         { text: '-', callback_data: 'slot_game_minus' },
-    //                         { text: betButton(bet), callback_data: 'slot_game_____' },
-    //                         { text: '+', callback_data: 'slot_game_plus' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
-    //                         { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
-    //                         { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
-    //                         { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
-    //                     ],
-    //                 ],
-    //             },
-    //         });
-
-    //     }
-    // }
-    // // minimum button
-    // else if (query.data === 'slit_game_min') {
-    //     if (bet = 0.1) {
-    //         await bot.editMessageText(translate[languageState].games.slots.min_bet, {
-    //             chat_id: chatId,
-    //             message_id: messageId,
-    //             reply_markup: {
-    //                 inline_keyboard: [
-    //                     [
-    //                         { text: '-', callback_data: 'slot_game_minus' },
-    //                         { text: betButton(bet), callback_data: 'slot_game_____' },
-    //                         { text: '+', callback_data: 'slot_game_plus' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.min, callback_data: 'foobar' },
-    //                         { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
-    //                         { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
-    //                         { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
-    //                     ],
-    //                 ],
-    //             },
-    //         });
-    //     } else {
-    //         newBet = bet
-
-    //         newBet = 0.1
-    //         newBet = parseFloat(newBet)
-    //         newBet = newBet.toFixed(2)
-
-    //         bet = parseFloat(newBet)
-
-    //         await bot.editMessageText(slotsGameMessage(languageState, user, bet), {
-    //             chat_id: chatId,
-    //             message_id: messageId,
-    //             reply_markup: {
-    //                 inline_keyboard: [
-    //                     [
-    //                         { text: '-', callback_data: 'slot_game_minus' },
-    //                         { text: betButton(bet), callback_data: 'slot_game_____' },
-    //                         { text: '+', callback_data: 'slot_game_plus' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
-    //                         { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
-    //                         { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
-    //                         { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
-    //                     ],
-    //                 ],
-    //             },
-    //         });
-
-
-    //     }
-    // }
-    // // maximum button
-    // else if (query.data === 'slot_game_max') {
-    //     if (bet = 100) {
-    //         await bot.editMessageText(translate[languageState].games.slots.max_bet, {
-    //             chat_id: chatId,
-    //             message_id: messageId,
-    //             reply_markup: {
-    //                 inline_keyboard: [
-    //                     [
-    //                         { text: '-', callback_data: 'slot_game_minus' },
-    //                         { text: betButton(bet), callback_data: 'slot_game_____' },
-    //                         { text: '+', callback_data: 'slot_game_plus' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
-    //                         { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
-    //                         { text: translate[languageState].games.slots.max, callback_data: 'foobar' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
-    //                         { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
-    //                     ],
-    //                 ],
-    //             },
-    //         });
-    //     } else {
-    //         newBet = bet
-
-    //         newBet = 100
-    //         newBet = parseFloat(newBet)
-    //         newBet = newBet.toFixed(2)
-
-    //         bet = parseFloat(newBet)
-    //         await bot.editMessageText(slotsGameMessage(languageState, user, bet), {
-    //             chat_id: chatId,
-    //             message_id: messageId,
-    //             reply_markup: {
-    //                 inline_keyboard: [
-    //                     [
-    //                         { text: '-', callback_data: 'slot_game_minus' },
-    //                         { text: betButton(bet), callback_data: 'slot_game_____' },
-    //                         { text: '+', callback_data: 'slot_game_plus' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
-    //                         { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
-    //                         { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
-    //                     ],
-    //                     [
-
-    //                         { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
-    //                         { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
-    //                     ],
-    //                 ],
-    //             },
-    //         });
-
-
-    //     }
-    // }
-    // // spin
-    // else if (query.data === 'slot_game_spin') {
-    //     if ( bet > user.profile.balance) {
-    //         bot.sendMessage(chatId, '[**No balance]', deleteMessage);
-    //     } 
-    //     else {
-    //     let user = await allUsers.findOne({ _id: chatId });
-    //     let referralUser = await allUsers.findOne({ _id: user.referral_info.referral_who_invited_id })
-    //     // win bet
-    //     console.log(referralUser)
-    //     let winBet
-    //     // emoji
-    //     const emoji = `🎰`
-    //     //
-    //     const x3Win = [64]
-    //     const x2Win = [1, 22, 43]
-    //     const p20Win = [2, 3, 4, 5, 6, 9, 11, 16, 17, 18, 21, 23, 24, 26, 27, 32, 33, 35, 38, 41, 42, 43, 44, 48, 49, 54, 56, 59, 60, 61, 62, 63]
-    //     const p10Win = [0, 7, 8, 10, 12, 13, 14, 15, 19, 20, 25, 28, 29, 30, 31, 34, 36, 37, 39, 40, 45, 46, 47, 50, 51, 52, 53, 55, 57, 58];
-        
-    //     bot.editMessageText('...', {
-    //         chat_id: chatId,
-    //         message_id: messageId,
-    //     });
-    //     await bot.sendDice(chatId, { emoji })
-    //         .then(async (response) => {
-    //             console.log(response)
-    //             let diceValue = response.dice.value;
-    //             if (x3Win.includes(diceValue)) {
-
-    //                 winBet = bet * 3
-                    
-    //                 console.log(winBet)
-    //                 winBet = parseToNum(winBet)
-
-    //                 user.profile.balance = user.profile.balance - bet
-    //                 user.profile.balance = user.profile.balance + winBet
-    //                 user.profile.balance = parseToNum(user.profile.balance)
-
-    //                 user.balance.m_spend = user.balance.m_spend + bet
-    //                 user.balance.m_spend = parseToNum(user.balance.m_spend)
-
-    //                 user.game_info.slot_game_win = user.game_info.slot_game_win + winBet
-    //                 user.game_info.slot_game_win = parseToNum(user.game_info.slot_game_win)
-    //                 user.game_info.slot_game_loss = user.game_info.slot_game_loss + bet
-    //                 user.game_info.slot_game_loss = parseToNum(user.game_info.slot_game_loss)
-
-    //                 referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + bet
-    //                 referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
-                    
-                    
-    //                 user.balance.spend = user.balance.spend + bet
-    //                 user.balance.spend = parseInt(user.balance.spend )
-    //                 user.game_info.slot_game_played += 1
-    //                 user.save()
-    //                 referralUser.save()
-
-    //                 console.log(winBet, bet)
-    //                 await bot.editMessageText(`Ваш выигрыш ${winBet}$ \nВы виграли х3 от ставки`, {
-    //                     chat_id: chatId,
-    //                     message_id: messageId,
-    //                 });
-    //             }
-    //             else if (x2Win.includes(diceValue)) {
-
-    //                 winBet = bet * 2
-                    
-    //                 console.log(winBet)
-    //                 winBet = parseToNum(winBet)
-
-    //                 user.profile.balance = user.profile.balance - bet
-    //                 user.profile.balance = user.profile.balance + winBet
-    //                 user.profile.balance = parseToNum(user.profile.balance)
-
-    //                 user.balance.m_spend = user.balance.m_spend + bet
-    //                 user.balance.m_spend = parseToNum(user.balance.m_spend)
-
-    //                 user.game_info.slot_game_win = user.game_info.slot_game_win + winBet
-    //                 user.game_info.slot_game_win = parseToNum(user.game_info.slot_game_win)
-    //                 user.game_info.slot_game_loss = user.game_info.slot_game_loss + bet
-    //                 user.game_info.slot_game_loss = parseToNum(user.game_info.slot_game_loss)
-
-    //                 referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + bet
-    //                 referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
-    //                 user.balance.spend = user.balance.spend + bet
-    //                 user.balance.spend = parseInt(user.balance.spend )
-    //                 user.game_info.slot_game_played += 1
-    //                 user.save()
-    //                 referralUser.save()
-
-    //                 console.log(winBet, bet)
-    //                 await bot.editMessageText(`Ваш выигрыш ${winBet}$ \nВы виграли х2 от ставки`, {
-    //                     chat_id: chatId,
-    //                     message_id: messageId,
-    //                 });
-    //             }
-    //             else if (p20Win.includes(diceValue)) {
-
-
-    //                 winBet = bet * 0.2
-                    
-    //                 console.log(winBet)
-    //                 winBet = parseToNum(winBet)
-
-    //                 user.profile.balance = user.profile.balance - bet
-    //                 user.profile.balance = user.profile.balance + winBet
-    //                 user.profile.balance = parseToNum(user.profile.balance)
-
-    //                 user.balance.m_spend = user.balance.m_spend + bet
-    //                 user.balance.m_spend = parseToNum(user.balance.m_spend)
-
-    //                 user.game_info.slot_game_win = user.game_info.slot_game_win + winBet
-    //                 user.game_info.slot_game_win = parseToNum(user.game_info.slot_game_win)
-    //                 user.game_info.slot_game_loss = user.game_info.slot_game_loss + bet
-    //                 user.game_info.slot_game_loss = parseToNum(user.game_info.slot_game_loss)
-
-    //                 referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + bet
-    //                 referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
-                    
-                    
-    //                 user.balance.spend = user.balance.spend + bet
-    //                 user.balance.spend = parseInt(user.balance.spend )
-    //                 user.game_info.slot_game_played += 1
-    //                 user.save()
-    //                 referralUser.save()
-
-    //                 console.log(winBet, bet)
-    //                 await bot.editMessageText(`Ваш выигрыш ${winBet}$ \nВы виграли 20% от ставки`, {
-    //                     chat_id: chatId,
-    //                     message_id: messageId,
-    //                 });
-    //             }
-    //             else if (p10Win.includes(diceValue)) {
-    //                 winBet = bet * 0.1
-    //                 console.log(winBet)
-    //                 winBet = parseToNum(winBet)
-
-    //                 user.profile.balance = user.profile.balance - bet
-    //                 user.profile.balance = user.profile.balance + winBet
-    //                 user.profile.balance = parseToNum(user.profile.balance)
-
-    //                 user.balance.m_spend = user.balance.m_spend + bet
-    //                 user.balance.m_spend = parseToNum(user.balance.m_spend)
-
-    //                 user.game_info.slot_game_win = user.game_info.slot_game_win + winBet
-    //                 user.game_info.slot_game_win = parseToNum(user.game_info.slot_game_win)
-    //                 user.game_info.slot_game_loss = user.game_info.slot_game_loss + bet
-    //                 user.game_info.slot_game_loss = parseToNum(user.game_info.slot_game_loss)
-
-    //                 referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + bet
-    //                 referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
-    //                 user.balance.spend = user.balance.spend + bet
-    //                 user.balance.spend = parseInt(user.balance.spend )
-    //                 user.game_info.slot_game_played += 1
-    //                 user.save()
-    //                 referralUser.save()
-
-    //                 console.log(winBet, bet)
-    //                 await bot.editMessageText(`Ваш выигрыш ${winBet}$ \nВы Выиграли 10% от ставки`, {
-    //                     chat_id: chatId,
-    //                     message_id: messageId,
-    //                 });
-
-    //             }
-    //         })
-    //         .catch((error) => {
-    //             console.error('Ошибка при отправке анимированного эмодзи:', error);
-    //         })
-    //         .finally(async ()=> {
-    //             await bot.sendMessage(chatId, slotsGameMessage(languageState, user, bet), {
-    //                 reply_markup: {
-    //                     inline_keyboard: [
-    //                         [
-    //                             { text: '-', callback_data: 'slot_game_minus' },
-    //                             { text: betButton(bet), callback_data: 'slot_game_____' },
-    //                             { text: '+', callback_data: 'slot_game_plus' },
-    //                         ],
-    //                         [
-
-    //                             { text: translate[languageState].games.slots.min, callback_data: 'slit_game_min' },
-    //                             { text: translate[languageState].games.slots.double, callback_data: 'slot_game_double' },
-    //                             { text: translate[languageState].games.slots.max, callback_data: 'slot_game_max' },
-    //                         ],
-    //                         [
-
-    //                             { text: translate[languageState].games.slots.slot_game_back, callback_data: 'slot_game_back' },
-    //                             { text: translate[languageState].games.slots.slot_game_spin, callback_data: 'slot_game_spin' },
-    //                         ],
-    //                     ],
-    //                 }
-
-    //             })
-    //         })
-
-    //     }
-    // }
 });
 // settings
 bot.on('callback_query', async (query) => {
@@ -2901,25 +3110,25 @@ cron.schedule('* * * * *', async () => {
 cron.schedule('0 0 1 * *', async () => {
     // Получаем текущую дату
     const currentDate = new Date();
-  
+
     // Обновляем значение `balance.m_spend` для всех пользователей
     const usersToUpdate = await allUsers.find({});
     for (const user of usersToUpdate) {
-      user.balance.m_spend = 0;
-      await user.save();
+        user.balance.m_spend = 0;
+        await user.save();
     }
-  
-    console.log('Значение balance.m_spend обновлено для всех пользователей');
-  });
 
-  
+    console.log('Значение balance.m_spend обновлено для всех пользователей');
+});
+
+
 
 
 // Listen on the 'polling_error' event
 bot.on('polling_error', (error) => {
-	var time = new Date();
-	console.log("TIME:", time);
-	console.log("CODE:", error.code);  // => 'EFATAL'
-	console.log("MSG:", error.message);
-	console.log("STACK:", error.stack);
+    var time = new Date();
+    console.log("TIME:", time);
+    console.log("CODE:", error.code);  // => 'EFATAL'
+    console.log("MSG:", error.message);
+    console.log("STACK:", error.stack);
 });

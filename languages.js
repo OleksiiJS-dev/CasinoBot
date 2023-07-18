@@ -114,6 +114,7 @@ const translate = {
 
             status: 'Status',
             status_lvl: ['Beginner', 'Player', 'Bronze', 'Silver', 'Gold', 'Platinum (VIP)'],
+            
             referral: 'Referral link',
 
         },
