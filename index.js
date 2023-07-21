@@ -56,7 +56,6 @@ const {
     deleteMessage,
 
 } = require('./options/adminOptions');
-const { once } = require('nodemon');
 // db connection
 const connectToDb = () => {
     mongoose
@@ -455,37 +454,74 @@ bot.on("callback_query", async (query) => {
         bot.on("message", async (msg) => {
             const chatId = msg.chat.id;
             const text = msg.text;
-            const messageId = query.message.message_id;
-            if (!isNaN(text)) {
-                try {
-                    const invoice = await createCryptoPayInvoice.createInvoice(currencyCode, parseFloat(text), {});
+            const messageId = msg.message_id;
 
-                    bot.sendMessage(chatId, invoice.pay_url);
-                    bot.deleteMessage(chatId, messageId);
-                    bot.deleteMessage(chatId, messageId - 1);
-                    createCryptoPayInvoice.once('invoice_paid', update => console.log(update.payload));
-                } catch (error) {
-                    console.error('Ошибка при создании инвойса:', error);
-                    bot.sendMessage(chatId, 'Error');
-                }
+            if (!isNaN(text)) {
+                const invoice = await createCryptoPayInvoice.createInvoice(currencyCode, parseFloat(text), {});
+
+                bot.sendMessage(chatId, invoice.pay_url);
+                bot.sendMessage(chatId, invoice.invoice_id);
+                console.log(invoice)
+
+
+                bot.sendMessage(chatId, 'Crypto Pay Check', {
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: 'Check', callback_data: 'invoicepaid' }],
+                        ],
+                    }
+                });
             } else {
                 await bot.sendMessage(chatId, profile(languageState, user), startOptions(languageState));
             }
         });
 
-        //   const invoice = await createCryptoPayInvoice(currencyCode, 0.0, {});
-        //   const messageText = `Ваш инвойс в ${currencyCode}: ${invoice.url}`;
-
-        //   await bot.editMessageText(messageText, {
-        //     chat_id: chatId,
-        //     message_id: messageId,
-        //     reply_markup: {
-        //       inline_keyboard: [],
-        //     },
-        //   });
-
     }
-    // TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST
+    else if (query.data === 'invoicepaid') {
+        user.save()
+        const messageId = query.message.message_id
+        const chatId = query.from.id
+
+        const invoices = await createCryptoPayInvoice.getInvoices({ count: 1 });
+
+        console.log(query)
+        bot.deleteMessage(chatId, messageId)
+
+        switch (invoices.items[0].status) {
+            case 'paid':
+                
+    
+    
+                const promoPerc = user.promo;
+                    
+                const percent = promoPerc / 100;
+                const count = parseToNum(invoices.items[0].amount)
+
+                user.profile.balance = user.profile.balance + count;
+                user.profile.balance = user.profile.balance + count * percent;
+                user.promo = 0;
+            
+                try {
+                    await bot.sendMessage(chatId, 'Thank You', walletOptions(languageState));
+                } catch (error) {
+                    // Handle the error if needed
+                } finally {
+                    // This block will be executed regardless of whether there was an error or not
+                    user.save();
+                }
+                
+
+            default: 
+            bot.sendMessage(chatId, 'Crypto Pay Error', {
+                reply_markup: {
+                    inline_keyboard: [
+                        [{ text: 'Check', callback_data: 'invoicepaid' }],
+
+                    ],
+                }
+            });
+        }
+    }
     else if (query.data === '+100') {
         user.balance.balance += 100;
         user.profile.balance += 100;
@@ -614,7 +650,6 @@ bot.on("callback_query", async (query) => {
 let minBet = 0.10;
 let maxBet = 100.00;
 let newBet;
-
 bot.on('callback_query', async (query) => {
     const chatId = query.message.chat.id;
     const messageId = query.message.message_id;
@@ -1219,13 +1254,9 @@ bot.on('callback_query', async (query) => {
         }
     }
 });
-
 let minBetDice = 0.10;
 let maxBetDice = 100.00;
 let newBetDice;
-const diceGameMessage = (a, b, c) => {
-    return `${translate[a].games.dice.message}\n/n${translate[a].games.dice.message_game}`
-}
 // dice game
 bot.on('callback_query', async (query) => {
     const chatId = query.message.chat.id;
@@ -1235,11 +1266,12 @@ bot.on('callback_query', async (query) => {
     const diceGameMessage = (a, b, c) => {
         return `
 ${translate[a].games.dice.message}
-        `;
+${translate[a].profile.balance}: ${user.profile.balance} $`;
     };
     const diceBetMessage = (a, b, c) => {
         return `
 ${translate[a].games.dice.message}
+
 ${b.game_info.dice_bet} $
         `;
     };
@@ -1284,16 +1316,6 @@ ${b.game_info.dice_bet} $
             reply_markup: gamesOptions(languageState).reply_markup,
         });
     }
-    // else if (query.data === 'dice_st') {
-    //     await bot.editMessageText(profile(languageState, user), {
-    //         chat_id: chatId,
-    //         message_id: messageId,
-    //         reply_markup: gamesOptions(languageState).reply_markup,
-    //     });
-
-
-
-    // }
     else if (query.data === 'dice_game_back') {
         user.game_info.dice_game_position = [];
         user.save()
@@ -2482,8 +2504,13 @@ ${b.game_info.dice_bet} $
         };
     }
     else if (query.data === 'dice_game_play') {
+        const playerPositionInDiceGame = JSON.stringify(user.game_info.dice_game_position)
+        console.log(playerPositionInDiceGame.length)
         if (user.game_info.dice_bet > user.profile.balance) {
             bot.sendMessage(chatId, '[**No balance]', deleteMessage);
+        }
+        else if (playerPositionInDiceGame.length < 3) {
+            bot.sendMessage(chatId, '[**Place Bet]', deleteMessage)
         }
         else {
             let user = await allUsers.findOne({ _id: chatId });
@@ -2497,9 +2524,10 @@ ${b.game_info.dice_bet} $
             // //
             let diceWinBet
 
-            const reply_markupOtions = (b, c) => {
-                let result = {}
-                if (b.game_info.dice_game_position =  position1) {
+            const reply_markupOtions = async (b, c) => {
+                let result = {};
+                const gamePosition = JSON.stringify(b.game_info.dice_game_position);
+                if (gamePosition === JSON.stringify(position1)) {
                     result = {
                         reply_markup:
                         {
@@ -2532,8 +2560,8 @@ ${b.game_info.dice_bet} $
                         }
                     }
                 }
-                else if (b.game_info.dice_game_position  = position2) {
-                    result =  {
+                else if (gamePosition === JSON.stringify(position2)) {
+                    result = {
                         reply_markup:
                         {
                             inline_keyboard: [
@@ -2565,8 +2593,8 @@ ${b.game_info.dice_bet} $
                         }
                     }
                 }
-                else if (b.game_info.dice_game_position  = position3) {
-                    result =  {
+                else if (gamePosition === JSON.stringify(position3)) {
+                    result = {
                         reply_markup:
                         {
                             inline_keyboard: [
@@ -2598,8 +2626,8 @@ ${b.game_info.dice_bet} $
                         }
                     }
                 }
-                else if (b.game_info.dice_game_position = position4) {
-                    result =  {
+                else if (gamePosition === JSON.stringify(position4)) {
+                    result = {
                         reply_markup:
                         {
                             inline_keyboard: [
@@ -2631,8 +2659,8 @@ ${b.game_info.dice_bet} $
                         }
                     }
                 }
-                else if (b.game_info.dice_game_position  = position5) {
-                    result =  {
+                else if (gamePosition === JSON.stringify(position5)) {
+                    result = {
                         reply_markup:
                         {
                             inline_keyboard: [
@@ -2664,8 +2692,8 @@ ${b.game_info.dice_bet} $
                         }
                     }
                 }
-                else if (b.game_info.dice_game_position  = position6) {
-                    result =  {
+                else if (gamePosition === JSON.stringify(position6)) {
+                    result = {
                         reply_markup:
                         {
                             inline_keyboard: [
@@ -2697,8 +2725,8 @@ ${b.game_info.dice_bet} $
                         }
                     }
                 }
-                else if (b.game_info.dice_game_position  = position12) {
-                    result =  {
+                else if (gamePosition === JSON.stringify(position12)) {
+                    result = {
                         reply_markup:
                         {
                             inline_keyboard: [
@@ -2730,8 +2758,8 @@ ${b.game_info.dice_bet} $
                         }
                     }
                 }
-                else if (b.game_info.dice_game_position  = position34) {
-                    result =  {
+                else if (gamePosition === JSON.stringify(position34)) {
+                    result = {
                         reply_markup:
                         {
                             inline_keyboard: [
@@ -2763,8 +2791,8 @@ ${b.game_info.dice_bet} $
                         }
                     }
                 }
-                else if (b.game_info.dice_game_position  = position56) {
-                    result =  {
+                else if (gamePosition === JSON.stringify(position56)) {
+                    result = {
                         reply_markup:
                         {
                             inline_keyboard: [
@@ -2796,8 +2824,8 @@ ${b.game_info.dice_bet} $
                         }
                     }
                 }
-                else if (b.game_info.dice_game_position  = positionOdd) {
-                    result =  {
+                else if (gamePosition === JSON.stringify(positionOdd)) {
+                    result = {
                         reply_markup:
                         {
                             inline_keyboard: [
@@ -2829,8 +2857,8 @@ ${b.game_info.dice_bet} $
                         }
                     }
                 }
-                else if (b.game_info.dice_game_position  = positionEven) {
-                    result =  {
+                else if (gamePosition === JSON.stringify(positionEven)) {
+                    result = {
                         reply_markup:
                         {
                             inline_keyboard: [
@@ -2862,42 +2890,155 @@ ${b.game_info.dice_bet} $
                         }
                     }
                 }
-                return result 
+                return result;
             }
-
-
 
             bot.editMessageText('...', {
                 chat_id: chatId,
                 message_id: messageId,
             });
-
-
-            let reply_markupOtions__RESULT = reply_markupOtions(user, languageState)
-
-            console.log(reply_markupOtions(user, languageState))
-            console.log(reply_markupOtions__RESULT)
-
+            const reply_markupOtions__RESULT = await reply_markupOtions(user, languageState);
             await bot.sendDice(chatId, { emoji })
                 .then(async (response) => {
                     const diceValue = response.dice.value;
-                    const dice_game_position = user.game_info.dice_game_position;
+                    const dice_game_position = JSON.stringify(user.game_info.dice_game_position);
                     if (dice_game_position.includes(diceValue)) {
-                        console.log("You win")
+                        if (dice_game_position === JSON.stringify(position1) || dice_game_position === JSON.stringify(position2) || dice_game_position === JSON.stringify(position3) || dice_game_position === JSON.stringify(position4) || dice_game_position === JSON.stringify(position5) || dice_game_position === JSON.stringify(position6)) {
+                            bot.editMessageText('x5', {
+                                chat_id: chatId,
+                                message_id: messageId,
+                            });
+                            diceWinBet = user.game_info.dice_bet * 5
+
+                            console.log(diceWinBet)
+                            diceWinBet = parseToNum(diceWinBet)
+
+                            user.profile.balance = user.profile.balance - user.game_info.dice_bet
+                            user.profile.balance = user.profile.balance + diceWinBet
+                            user.profile.balance = parseToNum(user.profile.balance)
+
+                            user.balance.m_spend = user.balance.m_spend + user.game_info.dice_bet
+                            user.balance.m_spend = parseToNum(user.balance.m_spend)
+
+                            user.game_info.dice_game_win = user.game_info.dice_game_win + diceWinBet
+                            user.game_info.dice_game_win = parseToNum(user.game_info.dice_game_win)
+                            user.game_info.dice_game_loss = user.game_info.dice_game_loss + user.game_info.dice_bet
+                            user.game_info.dice_game_loss = parseToNum(user.game_info.dice_game_loss)
+
+                            if (user.referral_info.referral_who_invited_id != '') {
+                                referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + user.game_info.dice_bet
+                                referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
+                                referralUser.save()
+                            }
+
+                            user.balance.spend = user.balance.spend + user.game_info.dice_bet
+                            user.balance.spend = parseInt(user.balance.spend)
+                            user.game_info.dice_game_played += 1
+                            user.save()
+                        }
+                        else if (dice_game_position === JSON.stringify(position12) || dice_game_position === JSON.stringify(position34) || dice_game_position === JSON.stringify(position56)) {
+                            bot.editMessageText('x2.7', {
+                                chat_id: chatId,
+                                message_id: messageId,
+                            });
+                            diceWinBet = user.game_info.dice_bet * 2.7
+
+                            console.log(diceWinBet)
+                            diceWinBet = parseToNum(diceWinBet)
+
+                            user.profile.balance = user.profile.balance - user.game_info.dice_bet
+                            user.profile.balance = user.profile.balance + diceWinBet
+                            user.profile.balance = parseToNum(user.profile.balance)
+
+                            user.balance.m_spend = user.balance.m_spend + user.game_info.dice_bet
+                            user.balance.m_spend = parseToNum(user.balance.m_spend)
+
+                            user.game_info.dice_game_win = user.game_info.dice_game_win + diceWinBet
+                            user.game_info.dice_game_win = parseToNum(user.game_info.dice_game_win)
+                            user.game_info.dice_game_loss = user.game_info.dice_game_loss + user.game_info.dice_bet
+                            user.game_info.dice_game_loss = parseToNum(user.game_info.dice_game_loss)
+
+                            if (user.referral_info.referral_who_invited_id != '') {
+                                referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + user.game_info.dice_bet
+                                referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
+                                referralUser.save()
+                            }
+
+                            user.balance.spend = user.balance.spend + user.game_info.dice_bet
+                            user.balance.spend = parseInt(user.balance.spend)
+                            user.game_info.dice_game_played += 1
+                            user.save()
+                        }
+                        else if (dice_game_position === JSON.stringify(positionOdd) || dice_game_position === JSON.stringify(positionEven)) {
+                            bot.editMessageText('x0.8', {
+                                chat_id: chatId,
+                                message_id: messageId,
+                            });
+                            diceWinBet = user.game_info.dice_bet * 0.8
+
+                            console.log(diceWinBet)
+                            diceWinBet = parseToNum(diceWinBet)
+
+                            user.profile.balance = user.profile.balance - user.game_info.dice_bet
+                            user.profile.balance = user.profile.balance + diceWinBet
+                            user.profile.balance = parseToNum(user.profile.balance)
+
+                            user.balance.m_spend = user.balance.m_spend + user.game_info.dice_bet
+                            user.balance.m_spend = parseToNum(user.balance.m_spend)
+
+                            user.game_info.dice_game_win = user.game_info.dice_game_win + diceWinBet
+                            user.game_info.dice_game_win = parseToNum(user.game_info.dice_game_win)
+                            user.game_info.dice_game_loss = user.game_info.dice_game_loss + user.game_info.dice_bet
+                            user.game_info.dice_game_loss = parseToNum(user.game_info.dice_game_loss)
+
+                            if (user.referral_info.referral_who_invited_id != '') {
+                                referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + user.game_info.dice_bet
+                                referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
+                                referralUser.save()
+                            }
+
+                            user.balance.spend = user.balance.spend + user.game_info.dice_bet
+                            user.balance.spend = parseInt(user.balance.spend)
+                            user.game_info.dice_game_played += 1
+                            user.save()
+                        }
+                    }
+                    else {
+                        bot.editMessageText('[No win]', {
+                            chat_id: chatId,
+                            message_id: messageId,
+                        });
+
+
+                        user.profile.balance = user.profile.balance - user.game_info.dice_bet
+                        user.profile.balance = parseToNum(user.profile.balance)
+
+                        user.balance.m_spend = user.balance.m_spend + user.game_info.dice_bet
+                        user.balance.m_spend = parseToNum(user.balance.m_spend)
+
+                        user.game_info.dice_game_win = user.game_info.dice_game_win + diceWinBet
+                        user.game_info.dice_game_win = parseToNum(user.game_info.dice_game_win)
+                        user.game_info.dice_game_loss = user.game_info.dice_game_loss + user.game_info.dice_bet
+                        user.game_info.dice_game_loss = parseToNum(user.game_info.dice_game_loss)
+
+                        if (user.referral_info.referral_who_invited_id != '') {
+                            referralUser.referral_info.referral_balance.balance_earned = referralUser.referral_info.referral_balance.balance_earned + user.game_info.dice_bet
+                            referralUser.referral_info.referral_balance.balance_earned = parseToNum(referralUser.referral_info.referral_balance.balance_earned)
+                            referralUser.save()
+                        }
+
+                        user.balance.spend = user.balance.spend + user.game_info.dice_bet
+                        user.balance.spend = parseInt(user.balance.spend)
+                        user.game_info.dice_game_played += 1
+                        user.save()
                     }
                 })
                 .catch((error) => {
                     console.error('Ошибка при отправке анимированного эмодзи:', error);
                 })
                 .finally(async () => {
-                    const dice_game_position = user.game_info.dice_game_position
-
-
-
-
-                    await bot.sendMessage(chatId, diceGameMessage(languageState), reply_markupOtions(user, languageState))
+                    await bot.sendMessage(chatId, diceGameMessage(languageState), reply_markupOtions__RESULT)
                 })
-
         }
     }
 });
@@ -3087,12 +3228,6 @@ bot.on('callback_query', async (query) => {
     }
 });
 
-//  get info about user
-// bot.on('callback_query', async (query) => {
-
-// })
-
-
 cron.schedule('* * * * *', async () => {
     const currentDate = new Date();
 
@@ -3120,9 +3255,6 @@ cron.schedule('0 0 1 * *', async () => {
 
     console.log('Значение balance.m_spend обновлено для всех пользователей');
 });
-
-
-
 
 // Listen on the 'polling_error' event
 bot.on('polling_error', (error) => {
