@@ -217,34 +217,28 @@ module.exports = (translate) => {
             },
         };
     };
-    // topup ctypto;
-    // const topUpCrypto = (languageState) => {
-    //     return {
-    //         reply_markup: {
-    //             inline_keyboard: [
-    //                 [
-    //                     { text: translate[languageState].wallet.options[0], callback_data: 'crypto' },
-    //                     { text: translate[languageState].wallet.options[1], callback_data: 'fiat' },
-
-    //                 ],
-    //                 [{ text: translate[languageState].wallet.help, callback_data: 'help' },],
-    //                 [{ text: translate[languageState].wallet.back, callback_data: 'topUpCryptoBack' },],
-    //             ]
-    //         }
-    //     };
-    // };
-    // const topUpCrypto = (languageState) => {
-    //     return {
-    //         reply_markup: {
-    //             inline_keyboard: [
-    //                 [],
-    //                 [],
-    //                 [],
-    //                 [],
-    //             ]
-    //         }
-    //     };
-    // };
+    const boneGameOptions = (languageState) => {
+        return {
+            reply_markup: {
+                inline_keyboard: [
+                    [{ text: translate[languageState].games.dice.versus.search, callback_data: 'game_bone_searching' }], 
+                    [{ text: translate[languageState].games.dice.versus.сreate, callback_data: 'game_bone_creating' }],
+                    [{ text: translate[languageState].games.dice.versus.return, callback_data: 'dice_game_back' }] 
+                ],
+            },
+        };
+    };
+    const boneGameOptionsCreating = (languageState, boneBet) => {
+        return {
+            reply_markup: {
+                inline_keyboard: [
+                    [{ text: translate[languageState].games.dice.versus.creating, callback_data: 'game_bone_create' }],
+                    [{ text: `${translate[languageState].games.dice.versus.setting_bet} ${boneBet} $`, callback_data: 'bone_game_set_bet' }],
+                    [{ text: translate[languageState].games.dice.versus.return, callback_data: 'bone_game_back' }],
+                ],
+            },
+        };
+    };
     // REFERRAL;
     const referralOptions = (languageState) => {
         return {
@@ -319,6 +313,9 @@ module.exports = (translate) => {
         diceOptions,
         diceOptionsGame,
         slotGameOption,
+        // bone game
+        boneGameOptions,
+        boneGameOptionsCreating,
         // referral
         referralOptions,
         // referral balance

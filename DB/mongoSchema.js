@@ -5,6 +5,7 @@ const profileSchema = new mongoose.Schema({
     id: String,
     user_name: String,
     promo: Number,
+    pay_url: String,
     profile: {
         first_name: String,
         last_name: String,
@@ -40,8 +41,11 @@ const profileSchema = new mongoose.Schema({
         dice_game_played: Number,
         dice_game_win: Number,
         dice_game_loss: Number,
-        dice_game: {
-            room: String,
+        bone_game: {
+            room_id: String,
+            opponent_id: String,
+            game_bet: Number,
+            game_status: String,
         }
 
     },

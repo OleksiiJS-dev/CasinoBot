@@ -50,6 +50,17 @@ const translate = {
                 throw: 'Бросить 🎲',
                 even: 'Четные',
                 odd: 'Нечетные',
+                versus: {
+                    game: 'Создайте или найдите игру',
+                    search: 'Поиск',
+                    сreate: 'Создание',
+                    return: 'Назад',
+
+                    creating: 'Создать',
+                    setting_bet: 'Ставка:',
+                    place_a_bet: 'Выберите ставку',
+                    waiting_for_opponent: 'Ожидайте подключения второго игрока...'
+                },
             },
 
         },
@@ -155,6 +166,17 @@ const translate = {
                 throw: 'Throw 🎲',
                 even: 'Even',
                 odd: 'Odd',
+                versus: {
+                    game: 'Find game',
+                    search: 'Searching',
+                    сreate: 'Creating',
+                    return: 'Return',
+
+                    creating: 'Create',
+                    setting_bet: 'Bet is',
+                    place_a_bet: 'Place bet',
+                    waiting_for_opponent: 'Waiting for opponent...'
+                },
             },
 
         },

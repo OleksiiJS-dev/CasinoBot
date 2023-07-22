@@ -36,6 +36,10 @@ const {
     gamesOptions,
     slotOptions,
     diceOptions,
+
+    boneGameOptions,
+    boneGameOptionsCreating,
+
     diceOptionsGame,
     slotGameOption,
     // referral options
@@ -203,6 +207,7 @@ bot.onText(/\/start/, async (msg, match) => {
                         id: chatId,
                         user_name: userName,
                         promo: 0,
+                        pay_url: '',
                         profile: {
                             first_name: msg.from.first_name,
                             last_name: msg.from.last_name,
@@ -222,8 +227,11 @@ bot.onText(/\/start/, async (msg, match) => {
                             dice_game_win: 0,
                             dice_game_loss: 0,
 
-                            dice_game: {
-                                room: "room",
+                            bone_game: {
+                                room_id: '',
+                                opponent_id: '',
+                                game_bet: 1,
+                                game_status: '',
                             }
                         },
                         referral_info: {
@@ -319,13 +327,6 @@ bot.on("callback_query", async (query) => {
         const count = invitedUsersCount.length;
 
         let balance = thisUser.referral_info.referral_balance.balance_earned;
-        // let balance = thisUser.referral_info.referral_balance_spend_with_one_link;
-
-
-        // invitedUsersCount.forEach((user)=> {
-        //     balance = balance + user.referral_info.referral_balance_spend_with_one_link
-        //     balance = parseToNum(balance)
-        // })
 
         // thisUser.save()
 
@@ -362,6 +363,7 @@ ${translate[a].referral.ref_percentage}: ${percentage} %
         });
     }
 });
+
 // wallet
 bot.on("callback_query", async (query) => {
     const chatId = query.message.chat.id;
@@ -459,6 +461,9 @@ bot.on("callback_query", async (query) => {
             if (!isNaN(text)) {
                 const invoice = await createCryptoPayInvoice.createInvoice(currencyCode, parseFloat(text), {});
 
+                user.pay_url = invoice.pay_url
+                user.save()
+
                 bot.sendMessage(chatId, invoice.pay_url);
                 bot.sendMessage(chatId, invoice.invoice_id);
                 console.log(invoice)
@@ -478,29 +483,27 @@ bot.on("callback_query", async (query) => {
 
     }
     else if (query.data === 'invoicepaid') {
-        user.save()
         const messageId = query.message.message_id
         const chatId = query.from.id
 
-        const invoices = await createCryptoPayInvoice.getInvoices({ count: 1 });
+        const invoices = await createCryptoPayInvoice.getInvoices({ pay_url: user.pay_url });
 
         console.log(query)
-        bot.deleteMessage(chatId, messageId)
 
         switch (invoices.items[0].status) {
             case 'paid':
-                
-    
-    
+
+                bot.deleteMessage(chatId, messageId);
+
                 const promoPerc = user.promo;
-                    
+
                 const percent = promoPerc / 100;
-                const count = parseToNum(invoices.items[0].amount)
+                const count = parseFloat(invoices.items[0].amount)
 
                 user.profile.balance = user.profile.balance + count;
                 user.profile.balance = user.profile.balance + count * percent;
                 user.promo = 0;
-            
+                user.pay_url = '';
                 try {
                     await bot.sendMessage(chatId, 'Thank You', walletOptions(languageState));
                 } catch (error) {
@@ -509,17 +512,18 @@ bot.on("callback_query", async (query) => {
                     // This block will be executed regardless of whether there was an error or not
                     user.save();
                 }
-                
 
-            default: 
-            bot.sendMessage(chatId, 'Crypto Pay Error', {
-                reply_markup: {
-                    inline_keyboard: [
-                        [{ text: 'Check', callback_data: 'invoicepaid' }],
+                break;
+            default:
+                bot.deleteMessage(chatId, messageId);
+                bot.sendMessage(chatId, 'Crypto Pay Error', {
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: 'Check', callback_data: 'invoicepaid' }],
 
-                    ],
-                }
-            });
+                        ],
+                    }
+                });
         }
     }
     else if (query.data === '+100') {
@@ -656,33 +660,32 @@ bot.on('callback_query', async (query) => {
     user = await allUsers.findOne({ _id: chatId });
     slotsGameMessage = (a, b, c) => {
         return `
-    ${translate[a].games.slots.message}
+${translate[a].games.slots.message}
 
-    ${translate[a].profile.balance} : ${b.profile.balance} $
+${translate[a].profile.balance} : ${b.profile.balance} $
 
-    ${translate[a].games.slots.bet} : ${c} $
+${translate[a].games.slots.bet} : ${c} $
         `;
     };
     slotsGameMessageBetIsTooBig = (a, b) => {
         return `
-    ${translate[a].games.slots.bet_is_too_big}
+${translate[a].games.slots.bet_is_too_big}
         `;
     };
     slotsGameMessageBetIsTooSmall = (a, b) => {
         return `
-    ${translate[a].games.slots.bet_is_too_small}
+${translate[a].games.slots.bet_is_too_small}
         `;
     };
     lowBalanceMessage = (a, b) => {
         return `
-    ${translate[a].wallet.low_balance}
+${translate[a].wallet.low_balance}
         `;
     };
     let betButton = (bet) => {
         if (typeof bet === 'number') {
             return `${bet.toFixed(2)} $`;
         } else {
-
             bet = parseFloat(bet)
             bet = bet.toFixed(2)
             return bet;
@@ -1102,11 +1105,11 @@ bot.on('callback_query', async (query) => {
                         }
 
                         user.balance.spend = user.balance.spend + user.game_info.slot_bet
-                        user.balance.spend = parseInt(user.balance.spend)
+                        user.balance.spend = parseFloat(user.balance.spend)
                         user.game_info.slot_game_played += 1
                         user.save()
 
-                        console.log(winBet, bet)
+
                         await bot.editMessageText(`Ваш выигрыш ${winBet}$ \nВы виграли х3 от ставки`, {
                             chat_id: chatId,
                             message_id: messageId,
@@ -1270,7 +1273,7 @@ ${translate[a].profile.balance}: ${user.profile.balance} $`;
     };
     const diceBetMessage = (a, b, c) => {
         return `
-${translate[a].games.dice.message}
+${translate[a].games.dice.message} 
 
 ${b.game_info.dice_bet} $
         `;
@@ -1279,11 +1282,13 @@ ${b.game_info.dice_bet} $
         if (typeof bet === 'number') {
             return `${bet.toFixed(2)} $`;
         } else {
-
-            bet = parseFloat(bet)
-            bet = bet.toFixed(2)
+            bet = parseFloat(bet);
+            bet = bet.toFixed(2);
             return bet;
         }
+    };
+    const boneGameAbout = (languageState) => {
+        return translate[languageState].games.dice.versus.game;
     };
     // user.game_info.dice_bet
     // positions
@@ -1301,7 +1306,13 @@ ${b.game_info.dice_bet} $
 
     // new dice bet
     let newDiceBet;
-
+    const bone_game = user.game_info.bone_game;
+    // let user.game_info.bone_game.game_bet = bone_game.game_bet
+    let newBetVersus;
+    
+    const setBetMessage = (a) => {
+        return `${translate[a].games.dice.versus.place_a_bet}`
+    };
     if (query.data === 'dice') {
         await bot.editMessageText(translate[languageState].games.dice.message, {
             chat_id: chatId,
@@ -2189,8 +2200,8 @@ ${b.game_info.dice_bet} $
                         { text: '5-6', callback_data: 'dice_game_bet_on_5_6' },
                     ],
                     [
-                        { text: translate[languageState].games.dice.odd, callback_data: 'dice_game_bet_on_even' },
-                        { text: translate[languageState].games.dice.even, callback_data: 'dice_game_bet_on_odd' },
+                        { text: translate[languageState].games.dice.odd, callback_data: 'dice_game_bet_on_odd' },
+                        { text: translate[languageState].games.dice.even, callback_data: 'dice_game_bet_on_even' },
                     ],
                     [
                         { text: translate[languageState].games.dice.back, callback_data: 'dice_game_back' },
@@ -2505,7 +2516,7 @@ ${b.game_info.dice_bet} $
     }
     else if (query.data === 'dice_game_play') {
         const playerPositionInDiceGame = JSON.stringify(user.game_info.dice_game_position)
-        console.log(playerPositionInDiceGame.length)
+
         if (user.game_info.dice_bet > user.profile.balance) {
             bot.sendMessage(chatId, '[**No balance]', deleteMessage);
         }
@@ -2513,16 +2524,13 @@ ${b.game_info.dice_bet} $
             bot.sendMessage(chatId, '[**Place Bet]', deleteMessage)
         }
         else {
-            let user = await allUsers.findOne({ _id: chatId });
-            let referralUser = await allUsers.findOne({ _id: user.referral_info.referral_who_invited_id })
-            // win bet
-            // console.log(referralUser)
-            console.log(user)
-            // let winBet
+
+            let referralUser = await allUsers.findOne({ _id: user.referral_info.referral_who_invited_id });
+
             // // emoji
-            const emoji = `🎲️`
+            const emoji = `🎲️`;
             // //
-            let diceWinBet
+            let diceWinBet;
 
             const reply_markupOtions = async (b, c) => {
                 let result = {};
@@ -2897,7 +2905,9 @@ ${b.game_info.dice_bet} $
                 chat_id: chatId,
                 message_id: messageId,
             });
+            // iceGameMessage(languageState)
             const reply_markupOtions__RESULT = await reply_markupOtions(user, languageState);
+            const diceGameMessage__RESULT = await diceGameMessage(languageState)
             await bot.sendDice(chatId, { emoji })
                 .then(async (response) => {
                     const diceValue = response.dice.value;
@@ -2910,7 +2920,7 @@ ${b.game_info.dice_bet} $
                             });
                             diceWinBet = user.game_info.dice_bet * 5
 
-                            console.log(diceWinBet)
+
                             diceWinBet = parseToNum(diceWinBet)
 
                             user.profile.balance = user.profile.balance - user.game_info.dice_bet
@@ -2932,9 +2942,10 @@ ${b.game_info.dice_bet} $
                             }
 
                             user.balance.spend = user.balance.spend + user.game_info.dice_bet
-                            user.balance.spend = parseInt(user.balance.spend)
+                            user.balance.spend = parseFloat(user.balance.spend)
                             user.game_info.dice_game_played += 1
                             user.save()
+
                         }
                         else if (dice_game_position === JSON.stringify(position12) || dice_game_position === JSON.stringify(position34) || dice_game_position === JSON.stringify(position56)) {
                             bot.editMessageText('x2.7', {
@@ -2943,7 +2954,7 @@ ${b.game_info.dice_bet} $
                             });
                             diceWinBet = user.game_info.dice_bet * 2.7
 
-                            console.log(diceWinBet)
+
                             diceWinBet = parseToNum(diceWinBet)
 
                             user.profile.balance = user.profile.balance - user.game_info.dice_bet
@@ -2968,6 +2979,7 @@ ${b.game_info.dice_bet} $
                             user.balance.spend = parseInt(user.balance.spend)
                             user.game_info.dice_game_played += 1
                             user.save()
+
                         }
                         else if (dice_game_position === JSON.stringify(positionOdd) || dice_game_position === JSON.stringify(positionEven)) {
                             bot.editMessageText('x0.8', {
@@ -2976,7 +2988,7 @@ ${b.game_info.dice_bet} $
                             });
                             diceWinBet = user.game_info.dice_bet * 0.8
 
-                            console.log(diceWinBet)
+
                             diceWinBet = parseToNum(diceWinBet)
 
                             user.profile.balance = user.profile.balance - user.game_info.dice_bet
@@ -3001,7 +3013,10 @@ ${b.game_info.dice_bet} $
                             user.balance.spend = parseInt(user.balance.spend)
                             user.game_info.dice_game_played += 1
                             user.save()
+
+
                         }
+                        await bot.sendMessage(chatId, diceGameMessage(languageState), reply_markupOtions__RESULT)
                     }
                     else {
                         bot.editMessageText('[No win]', {
@@ -3028,20 +3043,445 @@ ${b.game_info.dice_bet} $
                         }
 
                         user.balance.spend = user.balance.spend + user.game_info.dice_bet
-                        user.balance.spend = parseInt(user.balance.spend)
+                        user.balance.spend = parseFloat(user.balance.spend)
                         user.game_info.dice_game_played += 1
                         user.save()
+                        await bot.sendMessage(chatId, diceGameMessage(languageState), reply_markupOtions__RESULT)
                     }
                 })
                 .catch((error) => {
                     console.error('Ошибка при отправке анимированного эмодзи:', error);
-                })
-                .finally(async () => {
-                    await bot.sendMessage(chatId, diceGameMessage(languageState), reply_markupOtions__RESULT)
-                })
+                });
         }
     }
+
+    else if (query.data === "dice_st") {
+        bot.editMessageText(boneGameAbout(languageState), {
+            chat_id: chatId,
+            message_id: messageId,
+            reply_markup: boneGameOptions(languageState).reply_markup,
+        })
+    }
+    else if (query.data === "game_bone_creating") {
+
+
+        bone_game.room_id = chatId;
+        bone_game.game_status = 'creating';
+        // const user.game_info.bone_game.game_bet = bone_game.game_bet;
+        user.save()
+        bot.editMessageText(boneGameAbout(languageState), {
+            chat_id: chatId,
+            message_id: messageId,
+            reply_markup: boneGameOptionsCreating(languageState, user.game_info.bone_game.game_bet).reply_markup,
+        })
+
+    }
+    else if (query.data === "bone_game_back") {
+        const bone_game = user.game_info.bone_game
+
+        bone_game.room_id = '';
+        bone_game.game_status = ''
+        user.save()
+        bot.editMessageText(boneGameAbout(languageState), {
+            chat_id: chatId,
+            message_id: messageId,
+            reply_markup: boneGameOptions(languageState).reply_markup,
+        })
+
+    }
+
+    else if (query.data === "game_bone_create") {
+        const chatId = query.message.chat.id;
+        const messageId = query.message.message_id;
+
+        const waitingMessage = (languageState) => {
+            return `${translate[languageState].games.dice.versus.waiting_for_opponent}`
+        }
+
+        bone_game.game_status = 'created'
+        user.save()
+        
+        bot.deleteMessage(chatId, messageId)
+
+        bot.sendMessage(chatId, waitingMessage(languageState), {
+            chat_id: chatId,
+            message_id: messageId,
+            reply_markup: {
+                inline_keyboard: [
+                    [{ text: translate[languageState].games.dice.versus.return, callback_data: 'bone_game_back' },],
+                ]
+            },
+        })
+
+    }
+
+
+
+
+
+    // minus button
+    else if (query.data === 'bone_game_set_bet') {
+        if (user.profile.balance < 0.1) {
+            bot.sendMessage("[**Low balance", deleteMessage);
+        }
+        else {
+            await bot.editMessageText(setBetMessage(languageState), {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            { text: '-', callback_data: 'versus_game_minus' },
+                            { text: betButton(user.game_info.bone_game.game_bet), callback_data: 'versus_game________' },
+                            { text: '+', callback_data: 'versus_game_plus' },
+                        ],
+                        [
+
+                            { text: translate[languageState].games.slots.min, callback_data: 'versus_game_min' },
+                            { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
+                            { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
+                        ],
+                        [
+
+                            { text: translate[languageState].games.slots.slot_game_back, callback_data: 'versus_game_back' },
+                        ],
+                    ],
+                },
+            });
+        };
+    }
+    else if (query.data === 'versus_game_minus') {
+        console.log('minus')
+        switch (user.game_info.bone_game.game_bet) {
+            case game_bet = 0.1:
+                await bot.editMessageText(setBetMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: '-', callback_data: 'foobar' },
+                                { text: betButton(user.game_info.bone_game.game_bet), callback_data: 'dice_bet_____' },
+                                { text: '+', callback_data: 'versus_game_plus' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'versus_game_min' },
+                            { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
+                            { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'versus_game_back' },
+                            ],
+                        ],
+                    },
+                });
+            break;
+            default:
+                newBetVersus = user.game_info.bone_game.game_bet
+                newBetVersus = newBetVersus - 0.1
+                newBetVersus = parseFloat(newBetVersus)
+                newBetVersus = newBetVersus.toFixed(2)
+                user.game_info.bone_game.game_bet = parseFloat(newBetVersus)
+                user.save()
+                console.log(user)
+                console.log(user.game_info.bone_game.game_bet, newBetVersus)
+                await bot.editMessageText(setBetMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: '-', callback_data: 'versus_game_minus' },
+                                { text: betButton(user.game_info.bone_game.game_bet), callback_data: 'dice_bet_____' },
+                                { text: '+', callback_data: 'versus_game_plus' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'versus_game_min' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'versus_game_back' },
+                            ],
+                        ],
+                    },
+                });
+            break;
+        };
+    }
+    else if (query.data === 'versus_game_plus') {
+        switch (user.game_info.bone_game.game_bet) {
+            case game_bet = 100:
+                await bot.editMessageText(setBetMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: '-', callback_data: 'versus_game_minus' },
+                                { text: betButton(user.game_info.bone_game.game_bet), callback_data: 'dice_bet_____' },
+                                { text: '+', callback_data: 'foobar' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'versus_game_min' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'versus_game_back' },
+                            ],
+                        ],
+                    },
+                });
+            break;
+            default:
+                newBetVersus = user.game_info.bone_game.game_bet
+                newBetVersus = newBetVersus + 0.1
+                newBetVersus = parseFloat(newBetVersus)
+                newBetVersus = newBetVersus.toFixed(2)
+                user.game_info.bone_game.game_bet = parseFloat(newBetVersus)
+                user.save()
+                console.log(user)
+                console.log(user.game_info.bone_game.game_bet, newBetVersus)
+                await bot.editMessageText(setBetMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: '-', callback_data: 'versus_game_minus' },
+                                { text: betButton(user.game_info.bone_game.game_bet), callback_data: 'versus_game________' },
+                                { text: '+', callback_data: 'versus_game_plus' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'versus_game_min' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'versus_game_back' },
+                            ],
+                        ],
+                    },
+                });
+                break;
+        };
+    }
+    else if (query.data === 'versus_game_min') {
+        switch (user.game_info.bone_game.game_bet) {
+            case game_bet = 0.1:
+                await bot.editMessageText(setBetMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: '-', callback_data: 'versus_game_minus' },
+                                { text: betButton(user.game_info.bone_game.game_bet), callback_data: 'versus_game________' },
+                                { text: '+', callback_data: 'versus_game_plus' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'foobar' },
+                            { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
+                            { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'versus_game_back' },
+                            ],
+                        ],
+                    },
+                });
+                break;
+            default:
+                newBetVersus = user.game_info.bone_game.game_bet
+                newBetVersus = 0.1
+                newBetVersus = parseFloat(newBetVersus)
+                newBetVersus = newBetVersus.toFixed(2)
+                user.game_info.bone_game.game_bet = parseFloat(newBetVersus)
+                user.save()
+                console.log(user)
+                console.log(user.game_info.bone_game.game_bet, newBetVersus)
+                await bot.editMessageText(setBetMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: '-', callback_data: 'versus_game_minus' },
+                                { text: betButton(user.game_info.bone_game.game_bet), callback_data: 'versus_game________' },
+                                { text: '+', callback_data: 'versus_game_plus' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'versus_game_min' },
+                            { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
+                            { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'versus_game_back' },
+                            ],
+                        ],
+                    },
+                });
+                break;
+        };
+    }
+    else if (query.data === 'versus_game_double') {
+        if (user.game_info.bone_game.game_bet > 50) {
+            await bot.editMessageText(setBetMessage(languageState), {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            { text: '-', callback_data: 'versus_game_minus' },
+                            { text: betButton(user.game_info.bone_game.game_bet), callback_data: 'versus_game________' },
+                            { text: '+', callback_data: 'versus_game_plus' },
+                        ],
+                        [
+
+                            { text: translate[languageState].games.slots.min, callback_data: 'versus_game_min' },
+                            { text: translate[languageState].games.slots.double, callback_data: 'foobar' },
+                            { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
+                        ],
+                        [
+
+                            { text: translate[languageState].games.slots.slot_game_back, callback_data: 'versus_game_back' },
+                        ],
+                    ],
+                },
+            });
+        }
+        else {
+            console.log(user)
+            newBetVersus = user.game_info.bone_game.game_bet
+            newBetVersus = newBetVersus * 2
+            newBetVersus = parseFloat(newBetVersus)
+            newBetVersus = newBetVersus.toFixed(2)
+            user.game_info.bone_game.game_bet = parseFloat(newBetVersus)
+            user.save()
+            console.log(user)
+            console.log(user.game_info.bone_game.game_bet, newBetVersus)
+            await bot.editMessageText(setBetMessage(languageState), {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            { text: '-', callback_data: 'versus_game_minus' },
+                            { text: betButton(user.game_info.bone_game.game_bet), callback_data: 'versus_game________' },
+                            { text: '+', callback_data: 'versus_game_plus' },
+                        ],
+                        [
+
+                            { text: translate[languageState].games.slots.min, callback_data: 'versus_game_min' },
+                            { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
+                            { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
+                        ],
+                        [
+
+                            { text: translate[languageState].games.slots.slot_game_back, callback_data: 'versus_game_back' },
+                        ],
+                    ],
+                },
+            });
+        }
+
+    }
+    else if (query.data === 'versus_game_max') {
+        switch (user.game_info.bone_game.game_bet) {
+            case game_bet = 100:
+                await bot.editMessageText(setBetMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: '-', callback_data: 'versus_game_minus' },
+                                { text: betButton(user.game_info.bone_game.game_bet), callback_data: 'versus_game________' },
+                                { text: '+', callback_data: 'versus_game_plus' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'versus_game_min' },
+                            { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
+                            { text: translate[languageState].games.slots.max, callback_data: 'foobar' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'versus_game_back' },
+                            ],
+                        ],
+                    },
+                });
+                break;
+            default:
+                newBetVersus = user.game_info.bone_game.game_bet
+                newBetVersus = 100
+                newBetVersus = parseFloat(newBetVersus)
+                newBetVersus = newBetVersus.toFixed(2)
+                user.game_info.bone_game.game_bet = parseFloat(newBetVersus)
+                user.save()
+                console.log(user)
+                console.log(user.game_info.bone_game.game_bet, newBetVersus)
+                await bot.editMessageText(setBetMessage(languageState), {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: '-', callback_data: 'versus_game_minus' },
+                                { text: betButton(user.game_info.bone_game.game_bet), callback_data: 'slot_game_____' },
+                                { text: '+', callback_data: 'versus_game_plus' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.min, callback_data: 'versus_game_min' },
+                            { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
+                            { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
+                            ],
+                            [
+
+                                { text: translate[languageState].games.slots.slot_game_back, callback_data: 'versus_game_back' },
+                            ],
+                        ],
+                    },
+                });
+                break;
+        };
+    }
+    // dice bet config
+    else if (query.data === 'versus_game_back') {
+        bot.editMessageText(boneGameAbout(languageState), {
+            chat_id: chatId,
+            message_id: messageId,
+            reply_markup: boneGameOptionsCreating(languageState, user.game_info.bone_game.game_bet).reply_markup,
+        });
+    }
+
+    else if (query.data === 'game_bone_searching') {
+        const openGames = await allUsers.find({ 'game_info.bone_game.game_status': 'created' });
+
+        console.log(openGames)
+
+
+
+        bot.sendMessage()
+    }
+
 });
+
 // settings
 bot.on('callback_query', async (query) => {
     const chatId = query.from.id;
