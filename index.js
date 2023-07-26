@@ -222,7 +222,7 @@ bot.onText(/\/start/, async (msg, match) => {
                             slot_game_played: 0,
                             slot_game_win: 0,
                             slot_game_loss: 0,
-                            
+
                             dice_bet: 1,
                             dice_game_position: [],
                             dice_game_played: 0,
@@ -1320,7 +1320,7 @@ ${b.game_info.dice_bet} $
     const bone_game = user.game_info.bone_game;
     // let user.game_info.bone_game.game_bet = bone_game.game_bet
     let newBetVersus;
-    
+
     const setBetMessage = (a) => {
         return `${translate[a].games.dice.versus.place_a_bet}`
     };
@@ -1328,8 +1328,8 @@ ${b.game_info.dice_bet} $
     const allGames = await allUsers.find({ 'game_info.bone_game.game_status': 'created' });
     const allGamesConnected = await allUsers.find({ 'game_info.bone_game.game_status': 'connected' });
     // const gamesArrayForQuery = allGames.game_info.bone_game.room_id
-    const gamesArrayForQuery = allGames.map((items)=> items.game_info.bone_game.room_id);
-    
+    const gamesArrayForQuery = allGames.map((items) => items.game_info.bone_game.room_id);
+
     if (query.data === 'dice') {
         await bot.editMessageText(translate[languageState].games.dice.message, {
             chat_id: chatId,
@@ -3081,7 +3081,7 @@ ${b.game_info.dice_bet} $
     else if (query.data === "game_bone_creating") {
 
 
-        
+
         bone_game.game_status = 'creating';
         // const user.game_info.bone_game.game_bet = bone_game.game_bet;
         user.save()
@@ -3096,6 +3096,7 @@ ${b.game_info.dice_bet} $
         const bone_game = user.game_info.bone_game
 
         bone_game.room_id = '';
+        bone_game.opponent_id = '';
         bone_game.game_status = ''
         user.save()
         bot.editMessageText(boneGameAbout(languageState), {
@@ -3112,11 +3113,11 @@ ${b.game_info.dice_bet} $
         const waitingMessage = (languageState) => {
             return `${translate[languageState].games.dice.versus.waiting_for_opponent}`
         }
-        
+
         user.game_info.bone_game.room_id = chatId;
         user.game_info.bone_game.game_status = 'created'
         user.save()
-        
+
 
         bot.sendMessage(chatId, waitingMessage(languageState), {
             chat_id: chatId,
@@ -3178,8 +3179,8 @@ ${b.game_info.dice_bet} $
                             [
 
                                 { text: translate[languageState].games.slots.min, callback_data: 'versus_game_min' },
-                            { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
-                            { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
                             ],
                             [
 
@@ -3188,7 +3189,7 @@ ${b.game_info.dice_bet} $
                         ],
                     },
                 });
-            break;
+                break;
             default:
                 newBetVersus = user.game_info.bone_game.game_bet
                 newBetVersus = newBetVersus - 0.1
@@ -3221,7 +3222,7 @@ ${b.game_info.dice_bet} $
                         ],
                     },
                 });
-            break;
+                break;
         };
     }
     else if (query.data === 'versus_game_plus') {
@@ -3250,7 +3251,7 @@ ${b.game_info.dice_bet} $
                         ],
                     },
                 });
-            break;
+                break;
             default:
                 newBetVersus = user.game_info.bone_game.game_bet
                 newBetVersus = newBetVersus + 0.1
@@ -3302,8 +3303,8 @@ ${b.game_info.dice_bet} $
                             [
 
                                 { text: translate[languageState].games.slots.min, callback_data: 'foobar' },
-                            { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
-                            { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
                             ],
                             [
 
@@ -3335,8 +3336,8 @@ ${b.game_info.dice_bet} $
                             [
 
                                 { text: translate[languageState].games.slots.min, callback_data: 'versus_game_min' },
-                            { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
-                            { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
                             ],
                             [
 
@@ -3426,8 +3427,8 @@ ${b.game_info.dice_bet} $
                             [
 
                                 { text: translate[languageState].games.slots.min, callback_data: 'versus_game_min' },
-                            { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
-                            { text: translate[languageState].games.slots.max, callback_data: 'foobar' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'foobar' },
                             ],
                             [
 
@@ -3459,8 +3460,8 @@ ${b.game_info.dice_bet} $
                             [
 
                                 { text: translate[languageState].games.slots.min, callback_data: 'versus_game_min' },
-                            { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
-                            { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
+                                { text: translate[languageState].games.slots.double, callback_data: 'versus_game_double' },
+                                { text: translate[languageState].games.slots.max, callback_data: 'versus_game_max' },
                             ],
                             [
 
@@ -3490,15 +3491,15 @@ ${b.game_info.dice_bet} $
             return {
                 reply_markup: {
                     inline_keyboard: [
-                        ...allGames.map((item) => 
-                        [
-                            {
-                                text: `${item.game_info.bone_game.room_id} - ${item.game_info.bone_game.game_bet} $`, 
-                                callback_data: `${item.game_info.bone_game.room_id }`
-                            },
-                        ],
+                        ...allGames.map((item) =>
+                            [
+                                {
+                                    text: `${item.game_info.bone_game.room_id} - ${item.game_info.bone_game.game_bet} $`,
+                                    callback_data: `${item.game_info.bone_game.room_id}`
+                                },
+                            ],
                         ),
-                        
+
                         [
                             { text: translate[languageState].wallet.back, callback_data: 'bone_game_back' },
                         ],
@@ -3508,14 +3509,14 @@ ${b.game_info.dice_bet} $
         }
 
         const bruhFace = await openGameOptions(languageState);
-       
+
         console.log(gamesArrayForQuery)
         console.log(bruhFace.reply_markup.inline_keyboard[0][0])
 
 
-       bot.sendMessage(chatId, openGameMessage(languageState), openGameOptions(languageState));
+        bot.sendMessage(chatId, openGameMessage(languageState), openGameOptions(languageState));
 
-    
+
     }
     else if (gamesArrayForQuery.includes(query.data)) {
         const chatId = query.from.id;
@@ -3529,128 +3530,169 @@ ${b.game_info.dice_bet} $
 
         bot.sendMessage(chatId, `${translate[languageState].games.dice.versus.search_msg_found} : ${gameToJoin.game_info.bone_game.game_bet} $`, boneGameOptionThrow(languageState))
         bot.sendMessage(gameToJoin.game_info.bone_game.room_id, `${translate[languageState].games.dice.versus.search_msg_found}\n${gameToJoin.game_info.bone_game.game_bet} $`, boneGameOptionThrow(languageState))
-        
-        
+
+
     }
     else if (query.data === 'bone_game_throw') {
         const chatId = query.from.id;
         const messageId = query.message.message_id;
 
         const emoji = '🎲';
-        
+
         let firstPlayerFoo = 0
         let secondPlayerBar = 0
-        
-        await bot.sendDice(chatId, { emoji })
-            .then(async (response)=> {
-                const userIdWhoThrow = response.chat.id;
-                
-
-                const thisGameOwner = await allUsers.findOne({ "game_info.bone_game.room_id": userIdWhoThrow });
-                
-                const thisGameOpponent = await allUsers.findOne({ "game_info.bone_game.opponent_id": userIdWhoThrow });
-
-                if (thisGameOwner) {
-                    if (thisGameOwner.game_info.bone_game.owner_throw != 0) {
-                        bot.sendMessage(thisGameOwner.game_info.bone_game.room_id, `Вы уже бросили`, deleteMessage);
-                    } 
-                    else {
-                        thisGameOwner.game_info.bone_game.owner_throw = response.dice.value;
-                        await thisGameOwner.save();
-                        
-                        bot.sendMessage(thisGameOwner.game_info.bone_game.opponent_id, `Противник сделал бросок`);
-                        firstPlayerFoo = true;
-                    }
-                } else if (thisGameOpponent) {
-                    if (thisGameOwner.game_info.bone_game.owner_throw != 0) {
-                        bot.sendMessage(thisGameOwner.game_info.bone_game.opponent_id, `Вы уже бросили`, deleteMessage);
-                    } 
-                    else {
-                        thisGameOpponent.game_info.bone_game.opponent_throw = response.dice.value;
-                        await thisGameOpponent.save();
-                        
-                        bot.sendMessage(thisGameOpponent.game_info.bone_game.opponent_id, `Противник сделал бросок`);
-                        secondPlayerBar = true
-                    }
-                }
-
-                return response;
-            })
-            .then( async (response) => {
-               
-                if ( thisGame.game_info.bone_game.owner_throw !=0 && thisGame.game_info.bone_game.opponent_throw != 0 ) {
-                    const thisId = response.chat.id;
-                    let thisIdXXX;
-                    const thisGame = await allUsers.findOne({
-                        $or: [
-                          { "game_info.bone_game.room_id": thisId },
-                          { "game_info.bone_game.opponent_id": thisId },
-                        ],
-                    });
-                    const opponentUser = await allUsers.find( { id : thisGame.game_info.bone_game.opponent_id } );
-                    const ownerUser = await allUsers.find({ id: thisGame.game_info.bone_game.room_id });
-                    console.log('game is on');
-
-                    let winner;
-
-                    if (thisGame.game_info.bone_game.owner_throw > thisGame.game_info.bone_game.opponent_throw) {
-                        winner = thisGame.game_info.bone_game.room_id;
-
-                        thisGame.game_info.bone_game.owner_throw = 0;
-                        thisGame.game_info.bone_game.opponent_throw = 0;
-
-                        ownerUser.profile.balance = parseFloat(ownerUser.profile.balance)
-                        ownerUser.profile.balance = ownerUser.profile.balance + ownerUser.game_info.bone_game.game_bet
-                        ownerUser.profile.balance = parseFloat(ownerUser.profile.balance)
-                        ownerUser.save();
 
 
-                        
-                        
-                        opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
-                        opponentUser.profile.balance = opponentUser.profile.balance - ownerUser.game_info.bone_game.game_bet;
-                        opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
-                        opponentUser.save()
+        const thisGame = await allUsers.find({
+            $or: [
+                { "game_info.bone_game.room_id": chatId },
+                { "game_info.bone_game.opponent_id": chatId },
+            ],
+        });
 
-                        bot.sendMessage(opponentUser.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
-                        bot.sendMessage(thisGame.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
+        const bruh = thisGame.find( item =>  item.id == chatId);
 
-                    } else {
-                        
-                        
-                        winner = thisGame.game_info.bone_game.opponent_id;
-                        
-                        opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
-                        opponentUser.profile.balance = opponentUser.profile.balance + thisGame.game_info.bone_game.game_bet
-                        opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
-                        opponenetUser.save()
+        // console.log(bruh);
 
-                        thisGame.profile.balance = parseFloat(thisGame.profile.balance)
-                        thisGame.profile.balance = thisGame.profile.balance - thisGame.game_info.bone_game.game_bet;
-                        thisGame.profile.balance = parseFloat(thisGame.profile.balance)
-                        thisGame.save();
+        console.log(thisGame[0].game_info.bone_game, thisGame[1].game_info.bone_game,)
+        // const ownerUser = await allUsers.findOne({
+        //     id: thisGame.game_info.bone_game.room_id;
+        // });
 
-                        bot.sendMessage(opponentUser.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
-                        bot.sendMessage(thisGame.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
-                    }
+        // const opponentUser = await allUsers.findOne({
+        //     id: thisGame.game_info.bone_game.opponent_id;
+        // });
+
+        // console.log('typeof  bruh.id:' ,typeof bruh.id, 'typeof thisGame.id:', typeof  thisGame[0].id)
 
 
-                   
-                }
+        // console.log('SKU')
 
-               
-            })
-            
-            
-        
-        
-    }
+        // try { 
+        //     const bruh = thisGame.filter((item) => {item.id === chatId} )
+        //     console.log(bruh)
+        // }
+        // catch (err) {
+        //     throw new Error(err);
+    
+    // console.log('bruh is', bruh, 'this game is', thisGame);
+
+
+
+    // await bot.sendDice(chatId, { emoji })
+    //     .then(async (response)=> {
+    //         const userIdWhoThrow = response.chat.id;
+
+
+    //         const thisGameOwner = await allUsers.findOne({ "game_info.bone_game.room_id": userIdWhoThrow });
+
+    //         const thisGameOpponent = await allUsers.findOne({ "game_info.bone_game.opponent_id": userIdWhoThrow });
+
+    //         if (thisGameOwner) {
+    //             if (thisGameOwner.game_info.bone_game.owner_throw != 0) {
+    //                 bot.sendMessage(thisGameOwner.game_info.bone_game.room_id, `Вы уже бросили`, deleteMessage);
+    //             } 
+    //             else {
+    //                 thisGameOwner.game_info.bone_game.owner_throw = response.dice.value;
+    //                 await thisGameOwner.save();
+
+    //                 bot.sendMessage(thisGameOwner.game_info.bone_game.opponent_id, `Противник сделал бросок`);
+    //                 firstPlayerFoo = true;
+    //             }
+    //         } else if (thisGameOpponent) {
+    //             if (thisGameOpponent.game_info.bone_game.opponent_throw != 0) {
+
+    //                 console.log(response);
+    //                 bot.sendMessage(thisGameOpponent.game_info.bone_game.opponent_id, `Вы уже бросили`, deleteMessage);
+    //             } 
+    //             else {
+    //                 thisGameOpponent.game_info.bone_game.opponent_throw = response.dice.value;
+    //                 await thisGameOpponent.save();
+
+    //                 bot.sendMessage(thisGameOpponent.game_info.bone_game.room_id, `Противник сделал бросок`);
+    //                 secondPlayerBar = true
+    //             }
+    //         }
+
+    //         return response;
+    //     })
+    //     .then( async (response) => {
+    //         const thisId = response.chat.id;
+    //         const thisGame = await allUsers.findOne({
+    //             $or: [
+    //               { "game_info.bone_game.room_id": thisId },
+    //               { "game_info.bone_game.opponent_id": thisId },
+    //             ],
+    //         });
+
+    //         if ( thisGame.game_info.bone_game.owner_throw !=0 && thisGame.game_info.bone_game.opponent_throw != 0 ) {
+
+    //             let thisIdXXX;
+
+    //             const opponentUser = await allUsers.find( { id : thisGame.game_info.bone_game.opponent_id } );
+    //             const ownerUser = await allUsers.find({ id: thisGame.game_info.bone_game.room_id });
+    //             console.log('game is on');
+
+    //             let winner;
+
+    //             if (thisGame.game_info.bone_game.owner_throw > thisGame.game_info.bone_game.opponent_throw) {
+    //                 winner = thisGame.game_info.bone_game.room_id;
+
+    //                 thisGame.game_info.bone_game.owner_throw = 0;
+    //                 thisGame.game_info.bone_game.opponent_throw = 0;
+
+    //                 ownerUser.profile.balance = parseFloat(ownerUser.profile.balance)
+    //                 ownerUser.profile.balance = ownerUser.profile.balance + ownerUser.game_info.bone_game.game_bet
+    //                 ownerUser.profile.balance = parseFloat(ownerUser.profile.balance)
+    //                 ownerUser.save();
+
+
+
+
+    //                 opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
+    //                 opponentUser.profile.balance = opponentUser.profile.balance - ownerUser.game_info.bone_game.game_bet;
+    //                 opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
+    //                 opponentUser.save()
+
+    //                 bot.sendMessage(opponentUser.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
+    //                 bot.sendMessage(thisGame.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
+
+    //             } else {
+
+
+    //                 winner = thisGame.game_info.bone_game.opponent_id;
+
+    //                 opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
+    //                 opponentUser.profile.balance = opponentUser.profile.balance + thisGame.game_info.bone_game.game_bet
+    //                 opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
+    //                 opponenetUser.save()
+
+    //                 thisGame.profile.balance = parseFloat(thisGame.profile.balance)
+    //                 thisGame.profile.balance = thisGame.profile.balance - thisGame.game_info.bone_game.game_bet;
+    //                 thisGame.profile.balance = parseFloat(thisGame.profile.balance)
+    //                 thisGame.save();
+
+    //                 bot.sendMessage(opponentUser.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
+    //                 bot.sendMessage(thisGame.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
+    //             }
+
+
+
+    //         }
+
+
+    //     })
+
+
+
+
+}
     else if (query.data === 'bone_game_exit') {
-        const chatId = query.from.id;
-        const messageId = query.message.message_id;
+    const chatId = query.from.id;
+    const messageId = query.message.message_id;
 
-        
-    }
+
+}
 });
 
 // settings
