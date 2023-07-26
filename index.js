@@ -101,7 +101,7 @@ let newUser;
 // existing user initialization
 let existingUser;
 // profile initialization
-const profile = (a, b) => {
+const profile =  (a, b) => {
     let profileStatus;
     if (b.balance.m_spend > 15 && b.balance.m_spend <= 250) {
         b.profile.status_ru = translate[a].profile.status_lvl[1]
@@ -127,7 +127,7 @@ const profile = (a, b) => {
         b.profile.status_ru = translate[a].profile.status_lvl[0]
         b.profile.status_en = translate[a].profile.status_lvl[0]
     }
-    b.save()
+     b.save()
     if (a === 'ru') {
         profileStatus = b.profile.status_ru
     } else {
@@ -185,8 +185,6 @@ bot.onText(/\/start/, async (msg, match) => {
                         };
                     } else {
                         referralCode = '';
-                        existingUser.user_name = userName;
-                        await existingUser.save();
                         await bot.sendMessage(chatId, profile(languageState, existingUser), startOptions(languageState));
                     };
                 } else {
@@ -607,6 +605,18 @@ bot.on("callback_query", async (query) => {
 
         });
     }
+    // else if (query.data === 'withdrawl') {
+    //     const messageId = query.message.message_id;
+    //     const chatId = query.message.chat.id;
+    //     bot.sendMessage(chatId, 'Введите сообщение для заявки на пополнение, сумму и комментарий')
+    //     let message;
+    //     bot.on("message", async (msg) => {
+    //         const chatId = msg.chat.id;
+    //         const text = msg.text;
+
+
+    //     });
+
 });
 // games 
 bot.on("callback_query", async (query) => {
@@ -3475,11 +3485,15 @@ ${b.game_info.dice_bet} $
     }
     // dice bet config
     else if (query.data === 'versus_game_back') {
+        const chatId = query.from.id
+
         bot.editMessageText(boneGameAbout(languageState), {
             chat_id: chatId,
             message_id: messageId,
-            reply_markup: boneGameOptionsCreating(languageState, user.game_info.bone_game.game_bet).reply_markup,
+            reply_markup: boneGameOptionsCreating(languageState, user.game_info.bone_game.game_bet).reply_markup
         });
+        
+        
     }
     else if (query.data === 'game_bone_searching') {
 
@@ -3513,9 +3527,7 @@ ${b.game_info.dice_bet} $
         console.log(gamesArrayForQuery)
         console.log(bruhFace.reply_markup.inline_keyboard[0][0])
 
-
         bot.sendMessage(chatId, openGameMessage(languageState), openGameOptions(languageState));
-
 
     }
     else if (gamesArrayForQuery.includes(query.data)) {
@@ -3542,157 +3554,162 @@ ${b.game_info.dice_bet} $
         let firstPlayerFoo = 0
         let secondPlayerBar = 0
 
-
-        const thisGame = await allUsers.find({
-            $or: [
-                { "game_info.bone_game.room_id": chatId },
-                { "game_info.bone_game.opponent_id": chatId },
-            ],
-        });
-
-        const bruh = thisGame.find( item =>  item.id == chatId);
-
-        // console.log(bruh);
-
-        console.log(thisGame[0].game_info.bone_game, thisGame[1].game_info.bone_game,)
-        // const ownerUser = await allUsers.findOne({
-        //     id: thisGame.game_info.bone_game.room_id;
-        // });
-
-        // const opponentUser = await allUsers.findOne({
-        //     id: thisGame.game_info.bone_game.opponent_id;
-        // });
-
-        // console.log('typeof  bruh.id:' ,typeof bruh.id, 'typeof thisGame.id:', typeof  thisGame[0].id)
+    await bot.sendDice(chatId, { emoji })
+        .then(async (response)=> {
+            const userIdWhoThrow = response.chat.id;
 
 
-        // console.log('SKU')
+            const thisGameOwner = await allUsers.findOne({ "game_info.bone_game.room_id": userIdWhoThrow });
 
-        // try { 
-        //     const bruh = thisGame.filter((item) => {item.id === chatId} )
-        //     console.log(bruh)
-        // }
-        // catch (err) {
-        //     throw new Error(err);
-    
-    // console.log('bruh is', bruh, 'this game is', thisGame);
+            const thisGameOpponent = await allUsers.findOne({ "game_info.bone_game.opponent_id": userIdWhoThrow });
 
+            if (thisGameOwner) {
+                if (thisGameOwner.game_info.bone_game.owner_throw != 0) {
+                    bot.sendMessage(thisGameOwner.game_info.bone_game.room_id, `Вы уже бросили`, deleteMessage);
+                } 
+                else {
+                    thisGameOwner.game_info.bone_game.owner_throw = response.dice.value;
+                    await thisGameOwner.save();
 
+                    bot.sendMessage(thisGameOwner.game_info.bone_game.opponent_id, `Противник сделал бросок`);
+                    firstPlayerFoo = true;
+                }
+            } else if (thisGameOpponent) {
+                if (thisGameOpponent.game_info.bone_game.opponent_throw != 0) {
 
-    // await bot.sendDice(chatId, { emoji })
-    //     .then(async (response)=> {
-    //         const userIdWhoThrow = response.chat.id;
+                    console.log(response);
+                    bot.sendMessage(thisGameOpponent.game_info.bone_game.opponent_id, `Вы уже бросили`, deleteMessage);
+                } 
+                else {
+                    thisGameOpponent.game_info.bone_game.opponent_throw = response.dice.value;
+                    await thisGameOpponent.save();
 
+                    bot.sendMessage(thisGameOpponent.game_info.bone_game.room_id, `Противник сделал бросок`);
+                    secondPlayerBar = true
+                }
+            } 
+            return response;
+        })
+        .then( async (response) => {
+            const thisId = response.chat.id;
+            const thisGame = await allUsers.findOne({
+                $or: [
+                    { "game_info.bone_game.room_id": thisId },
+                    { "game_info.bone_game.opponent_id": thisId },
+                ],
+            });
 
-    //         const thisGameOwner = await allUsers.findOne({ "game_info.bone_game.room_id": userIdWhoThrow });
+            if ( thisGame.game_info.bone_game.owner_throw !=0 && thisGame.game_info.bone_game.opponent_throw != 0 ) {
 
-    //         const thisGameOpponent = await allUsers.findOne({ "game_info.bone_game.opponent_id": userIdWhoThrow });
+                let boneWinBet;
 
-    //         if (thisGameOwner) {
-    //             if (thisGameOwner.game_info.bone_game.owner_throw != 0) {
-    //                 bot.sendMessage(thisGameOwner.game_info.bone_game.room_id, `Вы уже бросили`, deleteMessage);
-    //             } 
-    //             else {
-    //                 thisGameOwner.game_info.bone_game.owner_throw = response.dice.value;
-    //                 await thisGameOwner.save();
+                const ownerUser = await allUsers.findOne({ id: thisGame.game_info.bone_game.room_id });
+                const opponentUser = await allUsers.findOne( { id : thisGame.game_info.bone_game.opponent_id } );
+                console.log('game is on');
 
-    //                 bot.sendMessage(thisGameOwner.game_info.bone_game.opponent_id, `Противник сделал бросок`);
-    //                 firstPlayerFoo = true;
-    //             }
-    //         } else if (thisGameOpponent) {
-    //             if (thisGameOpponent.game_info.bone_game.opponent_throw != 0) {
+                let winner;
 
-    //                 console.log(response);
-    //                 bot.sendMessage(thisGameOpponent.game_info.bone_game.opponent_id, `Вы уже бросили`, deleteMessage);
-    //             } 
-    //             else {
-    //                 thisGameOpponent.game_info.bone_game.opponent_throw = response.dice.value;
-    //                 await thisGameOpponent.save();
+                if (thisGame.game_info.bone_game.owner_throw > thisGame.game_info.bone_game.opponent_throw) {
+                    winner = thisGame.game_info.bone_game.room_id;
 
-    //                 bot.sendMessage(thisGameOpponent.game_info.bone_game.room_id, `Противник сделал бросок`);
-    //                 secondPlayerBar = true
-    //             }
-    //         }
+                    thisGame.game_info.bone_game.owner_throw = 0;
+                    thisGame.game_info.bone_game.opponent_throw = 0;
 
-    //         return response;
-    //     })
-    //     .then( async (response) => {
-    //         const thisId = response.chat.id;
-    //         const thisGame = await allUsers.findOne({
-    //             $or: [
-    //               { "game_info.bone_game.room_id": thisId },
-    //               { "game_info.bone_game.opponent_id": thisId },
-    //             ],
-    //         });
+                    boneWinBet = ownerUser.game_info.bone_game.game_bet
 
-    //         if ( thisGame.game_info.bone_game.owner_throw !=0 && thisGame.game_info.bone_game.opponent_throw != 0 ) {
-
-    //             let thisIdXXX;
-
-    //             const opponentUser = await allUsers.find( { id : thisGame.game_info.bone_game.opponent_id } );
-    //             const ownerUser = await allUsers.find({ id: thisGame.game_info.bone_game.room_id });
-    //             console.log('game is on');
-
-    //             let winner;
-
-    //             if (thisGame.game_info.bone_game.owner_throw > thisGame.game_info.bone_game.opponent_throw) {
-    //                 winner = thisGame.game_info.bone_game.room_id;
-
-    //                 thisGame.game_info.bone_game.owner_throw = 0;
-    //                 thisGame.game_info.bone_game.opponent_throw = 0;
-
-    //                 ownerUser.profile.balance = parseFloat(ownerUser.profile.balance)
-    //                 ownerUser.profile.balance = ownerUser.profile.balance + ownerUser.game_info.bone_game.game_bet
-    //                 ownerUser.profile.balance = parseFloat(ownerUser.profile.balance)
-    //                 ownerUser.save();
+                    thisGame.profile.balance = parseFloat(thisGame.profile.balance)
+                    thisGame.profile.balance = thisGame.profile.balance + thisGame.game_info.bone_game.game_bet
+                    thisGame.profile.balance = parseFloat(thisGame.profile.balance)
 
 
 
 
-    //                 opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
-    //                 opponentUser.profile.balance = opponentUser.profile.balance - ownerUser.game_info.bone_game.game_bet;
-    //                 opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
-    //                 opponentUser.save()
+                    opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
+                    opponentUser.profile.balance = opponentUser.profile.balance - thisGame.game_info.bone_game.game_bet;
+                    opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
+                    opponentUser.save()
 
-    //                 bot.sendMessage(opponentUser.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
-    //                 bot.sendMessage(thisGame.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
+                    bot.sendMessage(opponentUser.id, `winner is ${winner}\nваш баланс: ${opponentUser.profile.balance}$ - ${boneWinBet}$`, boneGameOptionThrow(languageState) );
+                    bot.sendMessage(thisGame.id, `winner is ${winner}\nваш баланс: ${thisGame.profile.balance}$ + ${boneWinBet}$`, boneGameOptionThrow(languageState) );
 
-    //             } else {
+                    boneWinBet = 0
 
+                    thisGame.game_info.bone_game.owner_throw = 0
+                    thisGame.game_info.bone_game.opponent_throw = 0
+                    thisGame.save()
 
-    //                 winner = thisGame.game_info.bone_game.opponent_id;
-
-    //                 opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
-    //                 opponentUser.profile.balance = opponentUser.profile.balance + thisGame.game_info.bone_game.game_bet
-    //                 opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
-    //                 opponenetUser.save()
-
-    //                 thisGame.profile.balance = parseFloat(thisGame.profile.balance)
-    //                 thisGame.profile.balance = thisGame.profile.balance - thisGame.game_info.bone_game.game_bet;
-    //                 thisGame.profile.balance = parseFloat(thisGame.profile.balance)
-    //                 thisGame.save();
-
-    //                 bot.sendMessage(opponentUser.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
-    //                 bot.sendMessage(thisGame.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
-    //             }
+                } else if ( thisGame.game_info.bone_game.owner_throw < thisGame.game_info.bone_game.opponent_throw) {
 
 
+                    winner = thisGame.game_info.bone_game.opponent_id;
 
-    //         }
+                    boneWinBet = ownerUser.game_info.bone_game.game_bet
+
+                    opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
+                    opponentUser.profile.balance = opponentUser.profile.balance + thisGame.game_info.bone_game.game_bet
+                    opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
+                    opponentUser.save()
+
+                    thisGame.profile.balance = parseFloat(thisGame.profile.balance)
+                    thisGame.profile.balance = thisGame.profile.balance - thisGame.game_info.bone_game.game_bet;
+                    thisGame.profile.balance = parseFloat(thisGame.profile.balance)
+
+                    bot.sendMessage(opponentUser.id, `winner is ${winner}\b ваш баланс: ${opponentUser.profile.balance}$ + ${boneWinBet}$`, boneGameOptionThrow(languageState) );
+                    bot.sendMessage(thisGame.id, `winner is ${winner}\nваш баланс: ${thisGame.profile.balance}$ - ${boneWinBet}$`, boneGameOptionThrow(languageState) );
+
+                    boneWinBet = 0
+
+                    thisGame.game_info.bone_game.owner_throw = 0
+                    thisGame.game_info.bone_game.opponent_throw = 0
+                    thisGame.save()
+                } else if ( thisGame.game_info.bone_game.owner_throw === thisGame.game_info.bone_game.opponent_throw ) {
+
+                    
+
+                    bot.sendMessage(thisGame.game_info.bone_game.opponent_id, `Ничья!\n ваш баланс: ${opponentUser.profile.balance}$ + 0$`, boneGameOptionThrow(languageState) );
+                    bot.sendMessage(thisGame.id, `Ничья!\n ${thisGame.profile.balance}$ + 0$`, boneGameOptionThrow(languageState) );
+                
+                
+                    thisGame.game_info.bone_game.owner_throw = 0
+                    thisGame.game_info.bone_game.opponent_throw = 0
+                    thisGame.save()
+                }       
 
 
-    //     })
+
+            }
 
 
+        })
 
-
-}
+    }
     else if (query.data === 'bone_game_exit') {
     const chatId = query.from.id;
     const messageId = query.message.message_id;
 
+    console.log(chatId)
 
-}
+    const thisGame = await allUsers.findOne({ 
+        $or: [
+            { "game_info.bone_game.room_id": chatId },
+            { "game_info.bone_game.opponent_id": chatId },
+          ],
+    });
+    //  const thisGame = await  allUsers.findOne({"game_info.bone_game.room_id": chatId  })
+    console.log(thisGame)
+    
+    await bot.sendMessage(thisGame.game_info.bone_game.opponent_id, 'Игра окончена', boneGameOptions(languageState))
+    
+    await bot.sendMessage(thisGame.game_info.bone_game.room_id, 'Игра окончена', boneGameOptions(languageState))
+    
+
+    thisGame.game_info.bone_game.owner_throw = 0;
+    thisGame.game_info.bone_game.opponent_throw = 0;
+    thisGame.game_info.bone_game.room_id = '';
+    thisGame.game_info.bone_game.opponent_id = '';
+    thisGame.game_info.bone_game.game_status = '';
+    thisGame.save();
+    }
 });
 
 // settings

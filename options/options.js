@@ -244,7 +244,7 @@ module.exports = (translate) => {
             reply_markup: {
                 inline_keyboard: [
                     [{ text: translate[languageState].games.dice.throw, callback_data: 'bone_game_throw' }],
-                    [{ text: translate[languageState].games.dice.versus.return, callback_data: 'bone_game_back' }],
+                    [{ text: translate[languageState].games.dice.versus.return, callback_data: 'bone_game_exit' }],
                 ],
             },
         };

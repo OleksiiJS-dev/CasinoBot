@@ -1,2 +1,9 @@
-node-telegram-bot-api
+@foile/crypto-pay-api
+dotenv
+mongodb
 mongoose
+node-cron
+node-telegram-bot-api
+nodemon
+pm2
+settings
