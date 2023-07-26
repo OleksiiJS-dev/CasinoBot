@@ -239,6 +239,16 @@ module.exports = (translate) => {
             },
         };
     };
+    const boneGameOptionThrow = (languageState) => {
+        return {
+            reply_markup: {
+                inline_keyboard: [
+                    [{ text: translate[languageState].games.dice.throw, callback_data: 'bone_game_throw' }],
+                    [{ text: translate[languageState].games.dice.versus.return, callback_data: 'bone_game_back' }],
+                ],
+            },
+        };
+    };
     // REFERRAL;
     const referralOptions = (languageState) => {
         return {
@@ -316,6 +326,7 @@ module.exports = (translate) => {
         // bone game
         boneGameOptions,
         boneGameOptionsCreating,
+        boneGameOptionThrow,
         // referral
         referralOptions,
         // referral balance

@@ -39,7 +39,7 @@ const {
 
     boneGameOptions,
     boneGameOptionsCreating,
-
+    boneGameOptionThrow,
     diceOptionsGame,
     slotGameOption,
     // referral options
@@ -60,6 +60,7 @@ const {
     deleteMessage,
 
 } = require('./options/adminOptions');
+const { calculateObjectSize } = require('bson');
 // db connection
 const connectToDb = () => {
     mongoose
@@ -221,17 +222,27 @@ bot.onText(/\/start/, async (msg, match) => {
                             slot_game_played: 0,
                             slot_game_win: 0,
                             slot_game_loss: 0,
+                            
                             dice_bet: 1,
                             dice_game_position: [],
                             dice_game_played: 0,
                             dice_game_win: 0,
                             dice_game_loss: 0,
 
+                            bone_bet_played: 0,
+                            bone_bet_win: 0,
+                            bone_bet_loss: 0,
+                            bone_bet_loss: 0,
+
                             bone_game: {
                                 room_id: '',
                                 opponent_id: '',
                                 game_bet: 1,
                                 game_status: '',
+
+                                owner_throw: 0,
+                                opponent_throw: 0,
+
                             }
                         },
                         referral_info: {
@@ -1313,6 +1324,12 @@ ${b.game_info.dice_bet} $
     const setBetMessage = (a) => {
         return `${translate[a].games.dice.versus.place_a_bet}`
     };
+
+    const allGames = await allUsers.find({ 'game_info.bone_game.game_status': 'created' });
+    const allGamesConnected = await allUsers.find({ 'game_info.bone_game.game_status': 'connected' });
+    // const gamesArrayForQuery = allGames.game_info.bone_game.room_id
+    const gamesArrayForQuery = allGames.map((items)=> items.game_info.bone_game.room_id);
+    
     if (query.data === 'dice') {
         await bot.editMessageText(translate[languageState].games.dice.message, {
             chat_id: chatId,
@@ -3054,7 +3071,6 @@ ${b.game_info.dice_bet} $
                 });
         }
     }
-
     else if (query.data === "dice_st") {
         bot.editMessageText(boneGameAbout(languageState), {
             chat_id: chatId,
@@ -3065,7 +3081,7 @@ ${b.game_info.dice_bet} $
     else if (query.data === "game_bone_creating") {
 
 
-        bone_game.room_id = chatId;
+        
         bone_game.game_status = 'creating';
         // const user.game_info.bone_game.game_bet = bone_game.game_bet;
         user.save()
@@ -3089,7 +3105,6 @@ ${b.game_info.dice_bet} $
         })
 
     }
-
     else if (query.data === "game_bone_create") {
         const chatId = query.message.chat.id;
         const messageId = query.message.message_id;
@@ -3097,11 +3112,11 @@ ${b.game_info.dice_bet} $
         const waitingMessage = (languageState) => {
             return `${translate[languageState].games.dice.versus.waiting_for_opponent}`
         }
-
-        bone_game.game_status = 'created'
+        
+        user.game_info.bone_game.room_id = chatId;
+        user.game_info.bone_game.game_status = 'created'
         user.save()
         
-        bot.deleteMessage(chatId, messageId)
 
         bot.sendMessage(chatId, waitingMessage(languageState), {
             chat_id: chatId,
@@ -3113,13 +3128,9 @@ ${b.game_info.dice_bet} $
             },
         })
 
+        // user.game_info.bone_game.game_status
+
     }
-
-
-
-
-
-    // minus button
     else if (query.data === 'bone_game_set_bet') {
         if (user.profile.balance < 0.1) {
             bot.sendMessage("[**Low balance", deleteMessage);
@@ -3469,17 +3480,177 @@ ${b.game_info.dice_bet} $
             reply_markup: boneGameOptionsCreating(languageState, user.game_info.bone_game.game_bet).reply_markup,
         });
     }
-
     else if (query.data === 'game_bone_searching') {
-        const openGames = await allUsers.find({ 'game_info.bone_game.game_status': 'created' });
 
-        console.log(openGames)
+        const openGameMessage = (languageState) => {
+            return `${translate[languageState].games.dice.versus.search_msg}`
+        }
+
+        const openGameOptions = (languageState) => {
+            return {
+                reply_markup: {
+                    inline_keyboard: [
+                        ...allGames.map((item) => 
+                        [
+                            {
+                                text: `${item.game_info.bone_game.room_id} - ${item.game_info.bone_game.game_bet} $`, 
+                                callback_data: `${item.game_info.bone_game.room_id }`
+                            },
+                        ],
+                        ),
+                        
+                        [
+                            { text: translate[languageState].wallet.back, callback_data: 'bone_game_back' },
+                        ],
+                    ]
+                }
+            }
+        }
+
+        const bruhFace = await openGameOptions(languageState);
+       
+        console.log(gamesArrayForQuery)
+        console.log(bruhFace.reply_markup.inline_keyboard[0][0])
 
 
+       bot.sendMessage(chatId, openGameMessage(languageState), openGameOptions(languageState));
 
-        bot.sendMessage()
+    
     }
+    else if (gamesArrayForQuery.includes(query.data)) {
+        const chatId = query.from.id;
+        const messageId = query.message.message_id;
 
+        const gameToJoin = await allUsers.findOne({ "game_info.bone_game.room_id": query.data });
+
+        gameToJoin.game_info.bone_game.opponent_id = chatId;
+        gameToJoin.game_info.bone_game.game_status = 'connected';
+        gameToJoin.save();
+
+        bot.sendMessage(chatId, `${translate[languageState].games.dice.versus.search_msg_found} : ${gameToJoin.game_info.bone_game.game_bet} $`, boneGameOptionThrow(languageState))
+        bot.sendMessage(gameToJoin.game_info.bone_game.room_id, `${translate[languageState].games.dice.versus.search_msg_found}\n${gameToJoin.game_info.bone_game.game_bet} $`, boneGameOptionThrow(languageState))
+        
+        
+    }
+    else if (query.data === 'bone_game_throw') {
+        const chatId = query.from.id;
+        const messageId = query.message.message_id;
+
+        const emoji = '🎲';
+        
+        let firstPlayerFoo = 0
+        let secondPlayerBar = 0
+        
+        await bot.sendDice(chatId, { emoji })
+            .then(async (response)=> {
+                const userIdWhoThrow = response.chat.id;
+                
+
+                const thisGameOwner = await allUsers.findOne({ "game_info.bone_game.room_id": userIdWhoThrow });
+                
+                const thisGameOpponent = await allUsers.findOne({ "game_info.bone_game.opponent_id": userIdWhoThrow });
+
+                if (thisGameOwner) {
+                    if (thisGameOwner.game_info.bone_game.owner_throw != 0) {
+                        bot.sendMessage(thisGameOwner.game_info.bone_game.room_id, `Вы уже бросили`, deleteMessage);
+                    } 
+                    else {
+                        thisGameOwner.game_info.bone_game.owner_throw = response.dice.value;
+                        await thisGameOwner.save();
+                        
+                        bot.sendMessage(thisGameOwner.game_info.bone_game.opponent_id, `Противник сделал бросок`);
+                        firstPlayerFoo = true;
+                    }
+                } else if (thisGameOpponent) {
+                    if (thisGameOwner.game_info.bone_game.owner_throw != 0) {
+                        bot.sendMessage(thisGameOwner.game_info.bone_game.opponent_id, `Вы уже бросили`, deleteMessage);
+                    } 
+                    else {
+                        thisGameOpponent.game_info.bone_game.opponent_throw = response.dice.value;
+                        await thisGameOpponent.save();
+                        
+                        bot.sendMessage(thisGameOpponent.game_info.bone_game.opponent_id, `Противник сделал бросок`);
+                        secondPlayerBar = true
+                    }
+                }
+
+                return response;
+            })
+            .then( async (response) => {
+               
+                if ( thisGame.game_info.bone_game.owner_throw !=0 && thisGame.game_info.bone_game.opponent_throw != 0 ) {
+                    const thisId = response.chat.id;
+                    let thisIdXXX;
+                    const thisGame = await allUsers.findOne({
+                        $or: [
+                          { "game_info.bone_game.room_id": thisId },
+                          { "game_info.bone_game.opponent_id": thisId },
+                        ],
+                    });
+                    const opponentUser = await allUsers.find( { id : thisGame.game_info.bone_game.opponent_id } );
+                    const ownerUser = await allUsers.find({ id: thisGame.game_info.bone_game.room_id });
+                    console.log('game is on');
+
+                    let winner;
+
+                    if (thisGame.game_info.bone_game.owner_throw > thisGame.game_info.bone_game.opponent_throw) {
+                        winner = thisGame.game_info.bone_game.room_id;
+
+                        thisGame.game_info.bone_game.owner_throw = 0;
+                        thisGame.game_info.bone_game.opponent_throw = 0;
+
+                        ownerUser.profile.balance = parseFloat(ownerUser.profile.balance)
+                        ownerUser.profile.balance = ownerUser.profile.balance + ownerUser.game_info.bone_game.game_bet
+                        ownerUser.profile.balance = parseFloat(ownerUser.profile.balance)
+                        ownerUser.save();
+
+
+                        
+                        
+                        opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
+                        opponentUser.profile.balance = opponentUser.profile.balance - ownerUser.game_info.bone_game.game_bet;
+                        opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
+                        opponentUser.save()
+
+                        bot.sendMessage(opponentUser.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
+                        bot.sendMessage(thisGame.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
+
+                    } else {
+                        
+                        
+                        winner = thisGame.game_info.bone_game.opponent_id;
+                        
+                        opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
+                        opponentUser.profile.balance = opponentUser.profile.balance + thisGame.game_info.bone_game.game_bet
+                        opponentUser.profile.balance = parseFloat(opponentUser.profile.balance)
+                        opponenetUser.save()
+
+                        thisGame.profile.balance = parseFloat(thisGame.profile.balance)
+                        thisGame.profile.balance = thisGame.profile.balance - thisGame.game_info.bone_game.game_bet;
+                        thisGame.profile.balance = parseFloat(thisGame.profile.balance)
+                        thisGame.save();
+
+                        bot.sendMessage(opponentUser.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
+                        bot.sendMessage(thisGame.id, `winner is ${winner}`, boneGameOptionThrow(languageState) );
+                    }
+
+
+                   
+                }
+
+               
+            })
+            
+            
+        
+        
+    }
+    else if (query.data === 'bone_game_exit') {
+        const chatId = query.from.id;
+        const messageId = query.message.message_id;
+
+        
+    }
 });
 
 // settings

@@ -59,7 +59,10 @@ const translate = {
                     creating: 'Создать',
                     setting_bet: 'Ставка:',
                     place_a_bet: 'Выберите ставку',
-                    waiting_for_opponent: 'Ожидайте подключения второго игрока...'
+                    waiting_for_opponent: 'Ожидайте подключения второго игрока...',
+                    search_msg: 'Поиск игры',
+                    search_msg_found: 'Опонент подключился',
+                    search_msg_found_nd: 'Бросайте кости, ставка',
                 },
             },
 
@@ -175,7 +178,10 @@ const translate = {
                     creating: 'Create',
                     setting_bet: 'Bet is',
                     place_a_bet: 'Place bet',
-                    waiting_for_opponent: 'Waiting for opponent...'
+                    waiting_for_opponent: 'Waiting for opponent...',
+                    search_msg: 'Open games:',
+                    search_msg_found: 'The opponent is connected',
+                    search_msg_found_nd: 'Roll the dice: Bet is',
                 },
             },
 
