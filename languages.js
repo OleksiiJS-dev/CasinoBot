@@ -17,7 +17,6 @@ const translate = {
             status: 'Статус',
             status_lvl: ['Новичок', 'Игрок', 'Бронзовый', 'Серебряный', 'Золотой', 'Платина (VIP)'],
             referral: 'Автоматическая реф. ссылка',            
-
         },
         games: {
             options: 'Игры',
@@ -71,6 +70,8 @@ const translate = {
             option: 'Кошелек',
             topup: 'Пополнить счет',
             withdrawl: 'Вывод средств',
+            
+            withdrawls_message: 'Сообщение отправлено',
             help: 'Как пополнить?',
             options: ['Крипта', 'Фиат'],
             back: 'Назад',
@@ -97,7 +98,7 @@ const translate = {
             profile: 'Профиль',
 
             balance: 'Вы заработали:',
-            ref_link: 'Ваша реферальная ссылка:',
+            ref_link: 'Ваша реферальная ссылка',
             people_in: 'Люди, присоединившиеся по вашей реферальной ссылке:',
             no_referral_link: 'У вас ещё нет реферальной ссылки',
             have_referral_link: 'У вас уже есть реферальная ссылка!',
@@ -116,8 +117,6 @@ const translate = {
             back:'Назад',
             language_selection:'Пожалуйста, выберите язык:',
         },
-        
-        
     },
     en: {
         profile: {
@@ -125,10 +124,9 @@ const translate = {
             balance: 'Balance',
             balance_cash: 'No money',
 
-
             status: 'Status',
             status_lvl: ['Beginner', 'Player', 'Bronze', 'Silver', 'Gold', 'Platinum (VIP)'],
-            
+
             referral: 'Referral link',
 
         },
@@ -192,7 +190,7 @@ const translate = {
             profile: 'Profile',
 
             balance: 'You have earned:',
-            ref_link: 'Your referral link:',
+            ref_link: 'Your referral link',
             people_in: 'People who have joined through your referral link:',
             no_referral_link: 'You don\'t have a referral link yet',
             have_referral_link: 'You already have a referral link!',
@@ -208,6 +206,7 @@ const translate = {
             option: 'Wallet',
             topup: 'Top up account',
             withdrawl: 'Withdrawals',
+            withdrawls_message: 'Message was sent',
             help: 'How to top up?',
             options: ['Crypto', 'Fiat'],
             back: 'Back',

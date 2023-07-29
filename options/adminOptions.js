@@ -81,6 +81,35 @@ const deleteMessage = {
         ],
     },
 }
+const adminAplicationRequestFirst = {
+    reply_markup: {
+        inline_keyboard: [
+            [
+                { text: 'Взять в работу 🟢', callback_data: 'aplication_in_process'},
+                { text: 'Информация о пользователе', callback_data: 'aplication_info'},
+            ],
+        ],
+    },
+}
+const adminAplicationRequestSecond = {
+    reply_markup: {
+        inline_keyboard: [
+            [
+                { text: 'Заявка обработана 🟠', callback_data: 'aplication_done'},
+                { text: 'Информация о пользователе', callback_data: 'aplication_info'},
+            ],
+        ],
+    },
+}
+const adminAplicationRequestFinal = {
+    reply_markup: {
+        inline_keyboard: [
+            [
+                { text: 'Информация о пользователе', callback_data: 'aplication_info'},
+            ],
+        ],
+    },
+}
 
 module.exports = { 
     adminOptions ,
@@ -88,4 +117,7 @@ module.exports = {
     promocodeBase ,
     deleteMessage ,
     promocodeCustomCreate ,
+    adminAplicationRequestFirst ,
+    adminAplicationRequestSecond ,
+    adminAplicationRequestFinal ,
 }
