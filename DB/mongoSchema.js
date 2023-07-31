@@ -42,10 +42,9 @@ const profileSchema = new mongoose.Schema({
         dice_game_win: Number,
         dice_game_loss: Number,
 
-        bone_bet_played: Number,
-        bone_bet_win: Number,
-        bone_bet_loss: Number,
-        bone_bet_loss: Number,
+        bone_game_played: Number,
+        bone_game_win: Number,
+        bone_game_loss: Number,
 
         bone_game: {
             room_id: String,

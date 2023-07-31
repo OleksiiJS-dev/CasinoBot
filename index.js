@@ -199,10 +199,9 @@ bot.onText(/\/start/, async (msg) => {
                             dice_game_win: 0,
                             dice_game_loss: 0,
 
-                            bone_bet_played: 0,
-                            bone_bet_win: 0,
-                            bone_bet_loss: 0,
-                            bone_bet_loss: 0,
+                            bone_game_played: 0,
+                            bone_game_win: 0,
+                            bone_game_loss: 0,
 
                             bone_game: {
                                 room_id: '',
@@ -576,9 +575,9 @@ Id: ${findUserById.id}
 Выигрыш в кости: ${findUserById.game_info.dice_game_win} $
 Проигрыш в кости: ${findUserById.game_info.dice_game_loss} $
 
-Кол-во игр в онлайн-кости: ${findUserById.game_info.bone_bet_played} игр
-Выигрыш в онлайн-кости: ${findUserById.game_info.bone_bet_win} $
-Проигрыш в онлайн-кости: ${findUserById.game_info.bone_bet_loss} $
+Кол-во игр в онлайн-кости: ${findUserById.game_info.bone_game_played} игр
+Выигрыш в онлайн-кости: ${findUserById.game_info.bone_game_win} $
+Проигрыш в онлайн-кости: ${findUserById.game_info.bone_game_loss} $
 
 Пользователей привел в реф: ${findRefInfoByUserId.length} пользователей
         `;
@@ -1191,7 +1190,6 @@ bot.on('callback_query', async (query) => {
     const chatId = query.from.id;
     const messageId = query.message.message_id;
     user = await allUsers.findOne({ _id: chatId });
-
     const diceGameMessage = (a, b, c) => {
         return `
 ${translate[a].games.dice.message}
@@ -2314,9 +2312,6 @@ ${b.game_info.dice_bet} $
     }
     else if (query.data === 'dice_bet_double') {
         if (user.game_info.dice_bet > 50) {
-            console.log(123)
-
-            console.log(user)
             await bot.editMessageText(diceBetMessage(languageState, user), {
                 chat_id: chatId,
                 message_id: messageId,
@@ -2342,7 +2337,6 @@ ${b.game_info.dice_bet} $
             });
         }
         else {
-            console.log(user)
             newDiceBet = user.game_info.dice_bet
             newDiceBet = newDiceBet * 2
             newDiceBet = parseFloat(newDiceBet)
@@ -3044,7 +3038,6 @@ ${b.game_info.dice_bet} $
         };
     }
     else if (query.data === 'versus_game_minus') {
-        console.log('minus')
         switch (user.game_info.bone_game.game_bet) {
             case game_bet = 0.1:
                 await bot.editMessageText(setBetMessage(languageState), {
@@ -3078,8 +3071,6 @@ ${b.game_info.dice_bet} $
                 newBetVersus = newBetVersus.toFixed(2)
                 user.game_info.bone_game.game_bet = parseFloat(newBetVersus)
                 user.save()
-                console.log(user)
-                console.log(user.game_info.bone_game.game_bet, newBetVersus)
                 await bot.editMessageText(setBetMessage(languageState), {
                     chat_id: chatId,
                     message_id: messageId,
@@ -3140,8 +3131,6 @@ ${b.game_info.dice_bet} $
                 newBetVersus = newBetVersus.toFixed(2)
                 user.game_info.bone_game.game_bet = parseFloat(newBetVersus)
                 user.save()
-                console.log(user)
-                console.log(user.game_info.bone_game.game_bet, newBetVersus)
                 await bot.editMessageText(setBetMessage(languageState), {
                     chat_id: chatId,
                     message_id: messageId,
@@ -3196,14 +3185,12 @@ ${b.game_info.dice_bet} $
                 });
                 break;
             default:
-                newBetVersus = user.game_info.bone_game.game_bet
-                newBetVersus = 0.1
-                newBetVersus = parseFloat(newBetVersus)
-                newBetVersus = newBetVersus.toFixed(2)
-                user.game_info.bone_game.game_bet = parseFloat(newBetVersus)
-                user.save()
-                console.log(user)
-                console.log(user.game_info.bone_game.game_bet, newBetVersus)
+                newBetVersus = user.game_info.bone_game.game_bet;
+                newBetVersus = 0.1;
+                newBetVersus = parseFloat(newBetVersus);
+                newBetVersus = newBetVersus.toFixed(2);
+                user.game_info.bone_game.game_bet = parseFloat(newBetVersus);
+                user.save();
                 await bot.editMessageText(setBetMessage(languageState), {
                     chat_id: chatId,
                     message_id: messageId,
@@ -3257,15 +3244,12 @@ ${b.game_info.dice_bet} $
             });
         }
         else {
-            console.log(user)
-            newBetVersus = user.game_info.bone_game.game_bet
-            newBetVersus = newBetVersus * 2
-            newBetVersus = parseFloat(newBetVersus)
-            newBetVersus = newBetVersus.toFixed(2)
-            user.game_info.bone_game.game_bet = parseFloat(newBetVersus)
-            user.save()
-            console.log(user)
-            console.log(user.game_info.bone_game.game_bet, newBetVersus)
+            newBetVersus = user.game_info.bone_game.game_bet;
+            newBetVersus = newBetVersus * 2;
+            newBetVersus = parseFloat(newBetVersus);
+            newBetVersus = newBetVersus.toFixed(2);
+            user.game_info.bone_game.game_bet = parseFloat(newBetVersus);
+            user.save();
             await bot.editMessageText(setBetMessage(languageState), {
                 chat_id: chatId,
                 message_id: messageId,
@@ -3320,14 +3304,12 @@ ${b.game_info.dice_bet} $
                 });
                 break;
             default:
-                newBetVersus = user.game_info.bone_game.game_bet
-                newBetVersus = 100
-                newBetVersus = parseFloat(newBetVersus)
-                newBetVersus = newBetVersus.toFixed(2)
-                user.game_info.bone_game.game_bet = parseFloat(newBetVersus)
-                user.save()
-                console.log(user)
-                console.log(user.game_info.bone_game.game_bet, newBetVersus)
+                newBetVersus = user.game_info.bone_game.game_bet;
+                newBetVersus = 100;
+                newBetVersus = parseFloat(newBetVersus);
+                newBetVersus = newBetVersus.toFixed(2);
+                user.game_info.bone_game.game_bet = parseFloat(newBetVersus);
+                user.save();
                 await bot.editMessageText(setBetMessage(languageState), {
                     chat_id: chatId,
                     message_id: messageId,
@@ -3391,14 +3373,8 @@ ${b.game_info.dice_bet} $
                 }
             }
         }
-
         const bruhFace = await openGameOptions(languageState);
-
-        console.log(gamesArrayForQuery)
-        console.log(bruhFace.reply_markup.inline_keyboard[0][0])
-
         bot.sendMessage(chatId, openGameMessage(languageState), openGameOptions(languageState));
-
     }
     else if (gamesArrayForQuery.includes(query.data)) {
         const chatId = query.from.id;
@@ -3439,8 +3415,6 @@ ${b.game_info.dice_bet} $
                 }
             } else if (thisGameOpponent) {
                 if (thisGameOpponent.game_info.bone_game.opponent_throw != 0) {
-
-                    console.log(response);
                     bot.sendMessage(thisGameOpponent.game_info.bone_game.opponent_id, `Вы уже бросили`, deleteMessage);
                 } 
                 else {
@@ -3465,12 +3439,20 @@ ${b.game_info.dice_bet} $
                 let boneWinBet;
                 const ownerUser = await allUsers.findOne({ id: thisGame.game_info.bone_game.room_id });
                 const refUserOwner = await allUsers.findOne({ id: ownerUser.referral_info.referral_who_invited_id });
-                const refCountOwner = await allUsers.find({ "referral_info.referral_who_invited_id": refUserOwner.id });
-                const refCountOwnerLength = refCountOwner.length;
+                let refCountOwner;
+                let refCountOwnerLength;
+                if ( refUserOwner ) {
+                    refCountOwner = await allUsers.find({ "referral_info.referral_who_invited_id": refUserOwner.id });
+                    refCountOwnerLength = refCountOwner.length;
+                }
                 const opponentUser = await allUsers.findOne({ id : thisGame.game_info.bone_game.opponent_id });
                 const refUserOpponent = await allUsers.findOne({ id: opponentUser.referral_info.referral_who_invited_id });
-                const refCountOpponent = await allUsers.find({ "referral_info.referral_who_invited_id": refUserOpponent.id });
-                const refCountOpponentLength = refCountOpponent.length;
+                let refCountOpponent 
+                let refCountOpponentLength
+                if ( refUserOpponent ) {
+                    refCountOpponent = await allUsers.find({ "referral_info.referral_who_invited_id": refUserOpponent.id });
+                    refCountOpponentLength = refCountOpponent.length;
+                } 
                 let percentageOwner = 0;
                 if (refCountOwnerLength === 0) {
                     percentageOwner = 0;
@@ -3491,7 +3473,6 @@ ${b.game_info.dice_bet} $
                 } else if (refCountOpponentLength >= 1500) {
                     percentageOpponent = 30;
                 };
-                console.log("refUserOpponent", refUserOpponent, "refCountOwnerLength",refCountOwnerLength)
                 const myPercentageToMultiplyWinningsOwner = percentageOwner / 100;
                 const myPercentageToMultiplyWinningsOpponent = percentageOpponent / 100;
                 let winner;
@@ -3503,6 +3484,11 @@ ${b.game_info.dice_bet} $
                     thisGame.profile.balance = parseFloat(thisGame.profile.balance);
                     thisGame.profile.balance = thisGame.profile.balance + thisGame.game_info.bone_game.game_bet;
                     thisGame.profile.balance = parseFloat(thisGame.profile.balance);
+                    // выигрывает хозяин игры
+                    thisGame.game_info.bone_game_played = thisGame.game_info.bone_game_played + 1;
+                    thisGame.game_info.bone_game_win = thisGame.game_info.bone_game_win + 1;
+                    opponentUser.game_info.bone_game_played = opponentUser.game_info.bone_game_played + 1
+                    opponentUser.game_info.bone_game_loss = opponentUser.game_info.bone_game_loss + 1
                     opponentUser.profile.balance = parseFloat(opponentUser.profile.balance);
                     opponentUser.profile.balance = opponentUser.profile.balance - thisGame.game_info.bone_game.game_bet;
                     opponentUser.profile.balance = parseFloat(opponentUser.profile.balance);
@@ -3531,6 +3517,11 @@ ${b.game_info.dice_bet} $
                     opponentUser.profile.balance = parseFloat(opponentUser.profile.balance);
                     opponentUser.profile.balance = opponentUser.profile.balance + thisGame.game_info.bone_game.game_bet;
                     opponentUser.profile.balance = parseFloat(opponentUser.profile.balance);
+                    // выигрывает опопнент
+                    opponentUser.game_info.bone_game_played = opponentUser.game_info.bone_game_played + 1;
+                    opponentUser.game_info.bone_game_win = opponentUser.game_info.bone_game_win + 1;
+                    thisGame.game_info.bone_game_played = thisGame.game_info.bone_game_played + 1
+                    thisGame.game_info.bone_game_loss = thisGame.game_info.bone_game_loss + 1
                     opponentUser.save();
                     thisGame.profile.balance = parseFloat(thisGame.profile.balance);
                     thisGame.profile.balance = thisGame.profile.balance - thisGame.game_info.bone_game.game_bet;
@@ -3558,31 +3549,26 @@ ${b.game_info.dice_bet} $
                     bot.sendMessage(thisGame.id, `Ничья!\n ${thisGame.profile.balance}$ + 0$`, boneGameOptionThrow(languageState) );
                     thisGame.game_info.bone_game.owner_throw = 0;
                     thisGame.game_info.bone_game.opponent_throw = 0;
+                    
+                    // у обоих опонентов одинаковые цифры, ничья 
+                    thisGame.game_info.bone_game_played = thisGame.game_info.bone_game_played + 1
                     thisGame.save();
+                    opponentUser.game_info.bone_game_played = opponentUser.game_info.bone_game_played + 1
+                    opponentUser.save();
                 }       
             };
         });
     }
     else if (query.data === 'bone_game_exit') {
     const chatId = query.from.id;
-    const messageId = query.message.message_id;
-
-    console.log(chatId)
-
     const thisGame = await allUsers.findOne({ 
         $or: [
             { "game_info.bone_game.room_id": chatId },
             { "game_info.bone_game.opponent_id": chatId },
           ],
     });
-    //  const thisGame = await  allUsers.findOne({"game_info.bone_game.room_id": chatId  })
-    console.log(thisGame)
-    
     await bot.sendMessage(thisGame.game_info.bone_game.opponent_id, 'Игра окончена', boneGameOptions(languageState))
-    
     await bot.sendMessage(thisGame.game_info.bone_game.room_id, 'Игра окончена', boneGameOptions(languageState))
-    
-
     thisGame.game_info.bone_game.owner_throw = 0;
     thisGame.game_info.bone_game.opponent_throw = 0;
     thisGame.game_info.bone_game.room_id = '';
@@ -3666,7 +3652,6 @@ bot.on('callback_query', async (query) => {
     else if (query.data === "delete_message") {
         const messageId = query.message.message_id
         const chatId = query.message.chat.id
-        console.log(query)
         bot.deleteMessage(chatId, messageId);
     }
     // promocode delete message 
@@ -3812,9 +3797,9 @@ Id: ${findUserById.id}
 Выигрыш в кости: ${findUserById.game_info.dice_game_win} $
 Проигрыш в кости: ${findUserById.game_info.dice_game_loss} $
 
-Кол-во игр в онлайн-кости: ${findUserById.game_info.bone_bet_played} игр
-Выигрыш в онлайн-кости: ${findUserById.game_info.bone_bet_win} $
-Проигрыш в онлайн-кости: ${findUserById.game_info.bone_bet_loss} $
+Кол-во игр в онлайн-кости: ${findUserById.game_info.bone_game_played} игр
+Выигрыш в онлайн-кости: ${findUserById.game_info.bone_game_win} $
+Проигрыш в онлайн-кости: ${findUserById.game_info.bone_game_loss} $
 
 Пользователей привел в реф: ${findRefInfoByUserId.length} пользователей
                         `
@@ -3865,7 +3850,6 @@ cron.schedule('0 0 1 * *', async () => {
         await user.save();
     }
 
-    console.log('Значение balance.m_spend обновлено для всех пользователей');
 });
 // Listen on the 'polling_error' event
 bot.on('polling_error', (error) => {
