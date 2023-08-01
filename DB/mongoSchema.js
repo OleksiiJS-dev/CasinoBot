@@ -31,32 +31,25 @@ const profileSchema = new mongoose.Schema({
     },
     game_info: {
         slot_bet: Number,
-
         slot_game_played: Number,
         slot_game_win: Number,
         slot_game_loss: Number,
-
         dice_bet: Number,
         dice_game_position: Array,
         dice_game_played: Number,
         dice_game_win: Number,
         dice_game_loss: Number,
-
         bone_game_played: Number,
         bone_game_win: Number,
         bone_game_loss: Number,
-
         bone_game: {
             room_id: String,
             opponent_id: String,
             game_bet: Number,
             game_status: String,
-            
             owner_throw: Number,
             opponent_throw: Number,
-
         }
-
     },
 
 
