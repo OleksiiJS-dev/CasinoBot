@@ -1,33 +1,30 @@
 const { languageState } = require("../languages");
 
 module.exports = (translate) => {
-    // USER OPTIONS
-    // start
     const startOptions = (languageState) => {
         return {
             reply_markup: {
                 inline_keyboard: [
                     [
 
-                        { text: translate[languageState].games.options, callback_data: 'games' },
+                        { text: translate[languageState].games.option, callback_data: 'user_games' },
                     ],
                     [
 
-                        { text: translate[languageState].wallet.option, callback_data: 'wallet' },
+                        { text: translate[languageState].wallet.option, callback_data: 'user_wallet' },
                     ],
                     [
 
-                        { text: translate[languageState].referral.option, callback_data: 'referral' },
+                        { text: translate[languageState].referral.option, callback_data: 'user_program' },
                     ],
                     [
 
-                        { text: translate[languageState].settings.options, callback_data: 'settings' },
+                        { text: translate[languageState].settings.option, callback_data: 'user_settings' },
                     ],
                 ],
             },
         };
     };
-    // settings
     const settingsOptions = (languageState) => {
         return {
             reply_markup: {
@@ -57,7 +54,6 @@ module.exports = (translate) => {
             },
         };
     };
-    // game
     const gamesOptions = (languageState) => {
         return {
             reply_markup: {
@@ -121,34 +117,33 @@ module.exports = (translate) => {
     const diceOptionsGame = (languageState) => {
         return {
             reply_markup: {
-                    inline_keyboard : [
-                        [ { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_value_' },],
-                        [
-                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_1' },
-                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_2' },
-                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_3' },
-                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_4' },
-                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_5' },
-                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_6' },
-                        ],
-                        [
-                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_1_2' },
-                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_3-4' },
-                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_5-6' },
-                        ],
-                        [
-                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_even' },
-                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_odd' },
-                        ],
-                        [
-                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_back' },
-                            { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_play' },
-                        ],
-                    ]
+                inline_keyboard: [
+                    [{ text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_value_' },],
+                    [
+                        { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_1' },
+                        { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_2' },
+                        { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_3' },
+                        { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_4' },
+                        { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_5' },
+                        { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_6' },
+                    ],
+                    [
+                        { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_1_2' },
+                        { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_3-4' },
+                        { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_5-6' },
+                    ],
+                    [
+                        { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_even' },
+                        { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_bet_on_odd' },
+                    ],
+                    [
+                        { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_back' },
+                        { text: translate[languageState].games.dice.dice_st, callback_data: 'dice_game_play' },
+                    ],
+                ],
             },
         };
     };
-    // slots 
     const slotGameOption = (languageState) => {
         return {
             reply_markup: {
@@ -174,7 +169,6 @@ module.exports = (translate) => {
             },
         };
     };
-    // wallet
     const walletOptions = (languageState) => {
         return {
             reply_markup: {
@@ -221,9 +215,9 @@ module.exports = (translate) => {
         return {
             reply_markup: {
                 inline_keyboard: [
-                    [{ text: translate[languageState].games.dice.versus.search, callback_data: 'game_bone_searching' }], 
+                    [{ text: translate[languageState].games.dice.versus.search, callback_data: 'game_bone_searching' }],
                     [{ text: translate[languageState].games.dice.versus.сreate, callback_data: 'game_bone_creating' }],
-                    [{ text: translate[languageState].games.dice.versus.return, callback_data: 'dice_game_back' }] 
+                    [{ text: translate[languageState].games.dice.versus.return, callback_data: 'dice_game_back' }]
                 ],
             },
         };
@@ -249,22 +243,16 @@ module.exports = (translate) => {
             },
         };
     };
-    // REFERRAL;
     const referralOptions = (languageState) => {
         return {
             reply_markup: {
                 inline_keyboard: [
-                    [
-                        { text: translate[languageState].referral.get, callback_data: 'referral_create' },
-
-                    ],
-                    [{ text: translate[languageState].referral.profile, callback_data: 'referral_profile' },],
-                    [{ text: translate[languageState].wallet.back, callback_data: 'referral_back' },],
-                ]
-            }
-        }
+                    [{ text: translate[languageState].referral.ref_options_profile.withdrawn, callback_data: 'referral_balance_witdrawl' },],
+                    [{ text: translate[languageState].referral.ref_options_profile.back, callback_data: 'referral_back' },],
+                ],
+            },
+        };
     };
-    //referral balance
     const referralBalanceOptions = (languageState) => {
         return {
             reply_markup: {
@@ -275,9 +263,9 @@ module.exports = (translate) => {
                     ],
                     [{ text: translate[languageState].referral.profile, callback_data: 'referral_balance_profile' },],
                     [{ text: translate[languageState].wallet.back, callback_data: 'referral_balance_back' },],
-                ]
-            }
-        }
+                ],
+            },
+        };
     };
     const referralBalanceProfile = (languageState) => {
         return {
@@ -288,11 +276,10 @@ module.exports = (translate) => {
 
                     ],
                     [{ text: translate[languageState].referral.ref_options_profile.back, callback_data: 'referral_balance_profile_back' },],
-                ]
-            }
-        }
-    }
-    // promocode activation
+                ],
+            },
+        };
+    };
     const promocodeActivation = (languageState) => {
         return {
             reply_markup: {
@@ -302,39 +289,30 @@ module.exports = (translate) => {
 
                     ],
                     [{ text: translate[languageState].referral.ref_options_profile.back, callback_data: 'referral_balance_profile_back' },],
-                ]
-            }
-        }
-    }
+                ],
+            },
+        };
+    };
     return {
-        // USER OPTIONS
         startOptions,
         settingsOptions,
         languageOptions,
-        // wallet
         walletOptions,
         topUpOptions,
         makepaymentTEST,
-        //  topUpCrypto,
-        // slots
         slotLowBalance,
         gamesOptions,
         slotOptions,
         diceOptions,
         diceOptionsGame,
         slotGameOption,
-        // bone game
         boneGameOptions,
         boneGameOptionsCreating,
         boneGameOptionThrow,
-        // referral
         referralOptions,
-        // referral balance
         referralBalanceOptions,
         referralBalanceProfile,
-        // promocode
-        promocodeActivation ,
-
+        promocodeActivation,
     };
 };
 

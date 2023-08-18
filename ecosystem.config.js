@@ -26,9 +26,9 @@ apps: [
   {
     name: 'casino-bot',
     script: 'index.js',
-    instances: 1,
+    instances: 100,
     autorestart: true,
-    watch: false,
+    watch: true,
     max_memory_restart: '1G',
     log_date_format: 'YYYY-MM-DD HH:mm:ss',
     env: {

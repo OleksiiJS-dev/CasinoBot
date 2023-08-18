@@ -1,11 +1,5 @@
 let languageState = 'ru';
 
-let no__translate = {
-    no__translate_name: 'Valera',
-    no__translate_ref: 'AFSKLN@!$*Hsf',
-    no__translate_balance_cash: 'Нет средств',
-};
-
 const translate = {
     ru: {
         profile: {
@@ -19,7 +13,7 @@ const translate = {
             referral: 'Автоматическая реф. ссылка',            
         },
         games: {
-            options: 'Игры',
+            option: 'Игры',
             game: ['Слоты 🎰', 'Кости'],
             back: 'Назад',
             slots: {
@@ -68,13 +62,14 @@ const translate = {
         },
         wallet: {
             option: 'Кошелек',
-            topup: 'Пополнить счет',
+            topup: 'Crypto Pay',
             withdrawl: 'Вывод средств',
-            
+            payment_msg: 'Введите сумму в ',
             withdrawls_message: 'Сообщение отправлено',
             help: 'Как пополнить?',
             options: ['Крипта', 'Фиат'],
             back: 'Назад',
+            topup_back: 'Назад к кошельку',
 
             fiat_later: 'Будет добавлено позже',
 
@@ -98,8 +93,8 @@ const translate = {
             profile: 'Профиль',
 
             balance: 'Вы заработали:',
-            ref_link: 'Ваша реферальная ссылка',
-            people_in: 'Люди, присоединившиеся по вашей реферальной ссылке:',
+            ref_link: 'Ваша реферальная ссылка 🔼',
+            people_in: 'Приглашено людей:',
             no_referral_link: 'У вас ещё нет реферальной ссылки',
             have_referral_link: 'У вас уже есть реферальная ссылка!',
             
@@ -111,7 +106,7 @@ const translate = {
             },
         },
         settings: {
-            options: 'Настройки',
+            option: 'Настройки',
             language: 'Русский',
             language_options: ['Английский','Русский'],
             back:'Назад',
@@ -131,14 +126,14 @@ const translate = {
 
         },
         settings: {
-            options: 'Settings',
+            option: 'Settings',
             language: 'English',
             language_options: ['English', 'Russian'],
             back: 'Back',
             language_selection: 'Please, select a language',
         },
         games: {
-            options: 'Games',
+            option: 'Games',
             game: ['Slots 🎰', 'Dice'],
             back: 'Back',
             slots: {
@@ -191,7 +186,7 @@ const translate = {
 
             balance: 'You have earned:',
             ref_link: 'Your referral link',
-            people_in: 'People who have joined through your referral link:',
+            people_in: 'Invited people:',
             no_referral_link: 'You don\'t have a referral link yet',
             have_referral_link: 'You already have a referral link!',
 
@@ -204,13 +199,14 @@ const translate = {
         },
         wallet: {
             option: 'Wallet',
-            topup: 'Top up account',
+            topup: 'Crypto Pay',
             withdrawl: 'Withdrawals',
+            payment_msg: 'Enter amount in ',
             withdrawls_message: 'Message was sent',
             help: 'How to top up?',
             options: ['Crypto', 'Fiat'],
             back: 'Back',
-
+            topup_back: 'Back to wallet',
             fiat_later: 'We will add it later...',
 
             topup_message_crypto: 'Please, choose the currency',
@@ -235,6 +231,5 @@ const translate = {
 module.exports = { 
     translate , 
     languageState ,
-    no__translate ,
     
     };
