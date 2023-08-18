@@ -368,16 +368,16 @@ const handleStartMessage = async (message) => {
   }
 };
 bot.onText(/\/start/, async (message) => {
-  consol.log("eas start")
+  console.log("eas start")
   // await handleStartMessage(message);
 });
 bot.on("callback_query", async (query) => {
-  consol.log("eas user_games")
-  await asyncMessage(query).then(async (query) => {
-    if (query.data === 'user_games') {
-      console.log(query.data)
-    }
-  })
+  console.log("eas user_games")
+  // await asyncMessage(query).then(async (query) => {
+  //   if (query.data === 'user_games') {
+  //     console.log(query.data)
+  //   }
+  // })
 });
 // program
 const generateProgramMessage = async (query) => {
