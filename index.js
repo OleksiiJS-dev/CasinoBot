@@ -53,7 +53,7 @@ app.post('/HSDHHDSKKKFFLLLSHJYYRYY', (req, res) => {
 
   res.sendStatus(200);
 });
-
+const webhookUrl = 'https://tcb-bot.herokuapp.com/HSDHHDSKKKFFLLLSHJYYRYY'
 bot.setWebHook(webhookUrl);
 
 
