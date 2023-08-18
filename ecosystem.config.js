@@ -1,8 +1,8 @@
 module.exports = {
   apps : [{
     name: "app",
-    script: "./app.js",
-    instances: "max",
+    script: "./index.js",
+    kill_timeout : 3000,
     env: {
       NODE_ENV: "development",
     },
