@@ -28,8 +28,8 @@ const cryptoToken = process.env.CRYPTO_TOKEN;
 const express = require('express')
 const app = express()
 app.use(express.json());
-app.listen('/HSDHHDSKKKFFLLLSHJYYRYY', () => {
-  console.log('Express.js server is running on port /HSDHHDSKKKFFLLLSHJYYRYY');
+app.listen(() => {
+  console.log('Express.js server is running');
 });
 // **************************************************************
 // const createCryptoPayInvoice = new CryptoPay(cryptoToken, {
