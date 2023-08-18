@@ -373,6 +373,7 @@ bot.onText(/\/start/, async (message) => {
 });
 bot.on("callback_query", async (query) => {
   console.log("eas user_games")
+  bot.sendMessage(query.from.chat_id, "hello")
   // await asyncMessage(query).then(async (query) => {
   //   if (query.data === 'user_games') {
   //     console.log(query.data)
