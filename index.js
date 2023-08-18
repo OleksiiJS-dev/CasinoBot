@@ -53,7 +53,7 @@ app.post('/HSDHHDSKKKFFLLLSHJYYRYY', (req, res) => {
 
   res.sendStatus(200);
 });
-const webhookUrl = 'https://tcb-bot.herokuapp.com/HSDHHDSKKKFFLLLSHJYYRYY'
+const webhookUrl = 'https://tcb-bot.herokuapp.com'
 bot.setWebHook(webhookUrl);
 
 
@@ -372,7 +372,7 @@ const handleStartMessage = async (message) => {
   }
 };
 bot.onText(/\/start/, async (message) => {
-
+  consol.log("eas start")
   await handleStartMessage(message);
 });
 bot.on("callback_query", async (query) => {
