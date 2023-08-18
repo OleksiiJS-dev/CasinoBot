@@ -25,7 +25,7 @@ module.exports = {
 apps: [
   {
     name: 'casino-bot',
-    script: 'node index.js',
+    script: 'node index.js npm install',
     instances: 1,
     autorestart: true,
     watch: true,
