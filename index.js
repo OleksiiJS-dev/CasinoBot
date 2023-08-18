@@ -9,52 +9,48 @@ const { CryptoPay } = require('@foile/crypto-pay-api');
 const cryptoToken = process.env.CRYPTO_TOKEN;
 
 
-const connectToDb = () => {
-  mongoose
-    .connect(mongooseUrl, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
-    .then(() => {
-      console.log('Подключено к базе');
-    })
-    .catch((e) => {
-      console.log(e);
-    });
-};
-connectToDb();
+// const connectToDb = () => {
+//   mongoose
+//     .connect(mongooseUrl, {
+//       useNewUrlParser: true,
+//       useUnifiedTopology: true,
+//     })
+//     .then(() => {
+//       console.log('Подключено к базе');
+//     })
+//     .catch((e) => {
+//       console.log(e);
+//     });
+// };
+// connectToDb();
 
 
-const express = require('express')
-const app = express()
-app.use(express.json());
-// Запуск Express.js сервера
-app.listen('/HSDHHDSKKKFFLLLSHJYYRYY', () => {
-  console.log('Express.js server is running on port 4200');
-});
+// const express = require('express')
+// const app = express()
+// app.use(express.json());
+// app.listen('/HSDHHDSKKKFFLLLSHJYYRYY', () => {
+//   console.log('Express.js server is running on port 4200');
+// });
 // **************************************************************
-const createCryptoPayInvoice = new CryptoPay(cryptoToken, {
-  hostname: 'testnet-pay.crypt.bot',
-  protocol: "https",
-  webhook: {
-    // ADD HEROKU ADRESS
-    serverHostname: 'tcb-bot.herokuapp.com',
-    path: '/HSDHHDSKKKFFLLLSHJYYRYY'
-  },
-});
-app.post('/HSDHHDSKKKFFLLLSHJYYRYY', (req, res) => {
-  const update = req.body;
+// const createCryptoPayInvoice = new CryptoPay(cryptoToken, {
+//   hostname: 'testnet-pay.crypt.bot',
+//   protocol: "https",
+//   webhook: {
+//     serverHostname: 'tcb-bot.herokuapp.com',
+//     path: '/HSDHHDSKKKFFLLLSHJYYRYY'
+//   },
+// });
+// app.post('/HSDHHDSKKKFFLLLSHJYYRYY', (req, res) => {
+//   const update = req.body;
 
-  // Обработка оповещения, например:
-  if (update.type === 'invoice_paid') {
-    console.log('Invoice Paid Event:', update.payload);
-    // Здесь вы можете добавить логику для обработки оповещения
-  }
+//   if (update.type === 'invoice_paid') {
+//     console.log('Invoice Paid Event:', update.payload);
+//   }
 
-  res.sendStatus(200);
-});
-const webhookUrl = 'https://tcb-bot.herokuapp.com'
-bot.setWebHook(webhookUrl);
+//   res.sendStatus(200);
+// });
+// const webhookUrl = 'https://tcb-bot.herokuapp.com'
+// bot.setWebHook(webhookUrl);
 
 
 
@@ -373,9 +369,10 @@ const handleStartMessage = async (message) => {
 };
 bot.onText(/\/start/, async (message) => {
   consol.log("eas start")
-  await handleStartMessage(message);
+  // await handleStartMessage(message);
 });
 bot.on("callback_query", async (query) => {
+  consol.log("eas user_games")
   await asyncMessage(query).then(async (query) => {
     if (query.data === 'user_games') {
       console.log(query.data)
