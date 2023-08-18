@@ -1,1 +1,1 @@
-worker: pm2 start
+web: pm2 start index.js
