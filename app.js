@@ -32,14 +32,14 @@ app.listen(() => {
   console.log('Express.js server is running');
 });
 // **************************************************************
-// const createCryptoPayInvoice = new CryptoPay(cryptoToken, {
-//   hostname: 'testnet-pay.crypt.bot',
-//   protocol: "https",
-//   webhook: {
-//     serverHostname: 'tcb-bot.herokuapp.com',
-//     path: '/HSDHHDSKKKFFLLLSHJYYRYY'
-//   },
-// });
+const createCryptoPayInvoice = new CryptoPay(cryptoToken, {
+  hostname: 'testnet-pay.crypt.bot',
+  protocol: "https",
+  webhook: {
+    serverHostname: 'tcb-bot.herokuapp.com',
+    path: '/22222'
+  },
+});
 // app.post('/HSDHHDSKKKFFLLLSHJYYRYY', (req, res) => {
 //   const update = req.body;
 
