@@ -25,12 +25,12 @@ const cryptoToken = process.env.CRYPTO_TOKEN;
 // connectToDb();
 
 
-// const express = require('express')
-// const app = express()
-// app.use(express.json());
-// app.listen('/HSDHHDSKKKFFLLLSHJYYRYY', () => {
-//   console.log('Express.js server is running on port 4200');
-// });
+const express = require('express')
+const app = express()
+app.use(express.json());
+app.listen('/HSDHHDSKKKFFLLLSHJYYRYY', () => {
+  console.log('Express.js server is running on port /HSDHHDSKKKFFLLLSHJYYRYY');
+});
 // **************************************************************
 // const createCryptoPayInvoice = new CryptoPay(cryptoToken, {
 //   hostname: 'testnet-pay.crypt.bot',
