@@ -28,25 +28,29 @@ connectToDb();
 const express = require('express')
 const app = express()
 app.use(express.json());
+// Запуск Express.js сервера
+app.listen('/HSDHHDSKKKFFLLLSHJYYRYY', () => {
+  console.log('Express.js server is running on port 4200');
+});
 // **************************************************************
 const createCryptoPayInvoice = new CryptoPay(cryptoToken, {
   hostname: 'testnet-pay.crypt.bot',
   protocol: "https",
   webhook: {
     // ADD HEROKU ADRESS
-    serverHostname: 'localhost',
-    path: '/secret-path'
+    serverHostname: 'tcb-bot.herokuapp.com',
+    path: '/HSDHHDSKKKFFLLLSHJYYRYY'
   },
 });
-app.post('/secret-path', (req, res) => {
+app.post('/HSDHHDSKKKFFLLLSHJYYRYY', (req, res) => {
   const update = req.body;
-  
+
   // Обработка оповещения, например:
   if (update.type === 'invoice_paid') {
-      console.log('Invoice Paid Event:', update.payload);
-      // Здесь вы можете добавить логику для обработки оповещения
+    console.log('Invoice Paid Event:', update.payload);
+    // Здесь вы можете добавить логику для обработки оповещения
   }
-  
+
   res.sendStatus(200);
 });
 
